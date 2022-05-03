@@ -24,7 +24,6 @@ static void printHelp();
 static void printTime();
 static void printRegisters();
 static void printMemory();
-static void splitScreen();
 static void zeroExceptionCommand();
 static void invalidOpCodeExceptionCommand();
 static void bringTime(char *finalStr);
