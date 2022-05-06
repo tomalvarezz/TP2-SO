@@ -2,6 +2,7 @@
 #include <naiveConsole.h>
 #include <exceptions.h>
 
+
 #define STDIN 0
 #define STDOUT 1
 #define USER 2
@@ -36,10 +37,11 @@ uint64_t syscall_handler(uint64_t rax, uint64_t rdi,uint64_t rsi, uint64_t rdx, 
         break;    
 
     case 6: 
-        break;
+        return malloc((uint64_t)rdi);
 
     case 7:
-        break;
+        free((void*)rdi);
+         break;
 
     case 8:
         break;

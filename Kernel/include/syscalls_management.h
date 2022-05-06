@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <keyboard.h>
 #include <time.h>
+#include <memory_manager.h>
 
 extern uint64_t RTC(uint64_t time);
 

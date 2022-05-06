@@ -8,7 +8,7 @@ typedef long Align;
 typedef union header{
     struct{
         union header *ptr;
-        size_t size;
+        uint64_t size;
     }data;
     
     Align x;
@@ -21,9 +21,10 @@ static header *base;
 static header *free_node = NULL;
 
 // Tamaño total de memoria de heap
-size_t total_heap_size;
+uint64_t total_heap_size;
 
-void initialize_memory_manager(char* heap_base,size_t heap_size){
+void initialize_memory_manager(char *heap_base, uint64_t heap_size)
+{
     if(heap_base==NULL){
         return;
     }
@@ -36,7 +37,6 @@ void initialize_memory_manager(char* heap_base,size_t heap_size){
 
     free_node->data.ptr= free_node;
 }
-
 
 void *malloc(uint64_t malloc_bytes){
     if(malloc_bytes == 0){
@@ -66,8 +66,7 @@ void *malloc(uint64_t malloc_bytes){
      * CAMBIAR ESTE COMMENT
      */
 
-
-    size_t malloc_units= (malloc_bytes + sizeof(header)-1) / sizeof(header) + 1;
+    uint64_t malloc_units = (malloc_bytes + sizeof(header) - 1) / sizeof(header) + 1;
 
     prevptr= free_node;
 

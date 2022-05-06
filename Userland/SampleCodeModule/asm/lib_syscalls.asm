@@ -6,6 +6,9 @@ GLOBAL sys_time
 GLOBAL sys_clear
 GLOBAL sys_get_registers
 GLOBAL sys_get_memory
+
+GLOBAL sys_malloc
+GLOBAL sys_free
 GLOBAL sys_sleep
 GLOBAL sys_invalid_op_code
 
@@ -76,6 +79,27 @@ sys_get_memory:
 	mov rsp, rbp
 	pop rbp
 	ret
+sys_malloc:
+    push rbp
+    mov rbp, rsp
+    push rbx
+    mov rax, 0x06
+    int 80h
+    pop rbx
+    mov rsp, rbp
+    pop rbp
+    ret
+
+sys_free:
+    push rbp
+    mov rbp, rsp
+    push rbx
+    mov rax, 0x07
+    int 80h
+    pop rbx
+    mov rsp, rbp
+    pop rbp
+    ret
 
 sys_sleep:
 	push rbp

@@ -18,6 +18,8 @@ char *strCat(char *dst, const char *src);
 void intToHexa(uint64_t num, char * str, int bytes);
 uint64_t hexaStrToint(char *hexaStr);
 int pow(int x, unsigned int y);
+void *malloc(uint64_t malloc_bytes);
+void free(void *block);
 
 #endif
 

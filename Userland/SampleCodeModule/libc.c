@@ -245,3 +245,13 @@ int pow(int x, unsigned int y)
     }
     return result;
 }
+
+void *malloc(uint64_t size)
+{
+    return sys_malloc(size);
+}
+
+void free(void *address)
+{
+    sys_free(address);
+}
