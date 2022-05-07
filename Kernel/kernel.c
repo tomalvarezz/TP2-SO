@@ -4,10 +4,12 @@
 #include <naiveConsole.h>
 #include <idtLoader.h>
 #include <exceptions.h>
+#include <memory_manager.h>
 
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
+#define HEAP_SIZE 1024 * 1024 * 64  // 64MB
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -20,6 +22,7 @@ static const uint64_t PageSize = 0x1000;
 
 static void * const sampleCodeModuleAddress = (void*)0x400000;
 static void * const sampleDataModuleAddress = (void*)0x500000;
+static void *const sampleCodeModuleHeapAddress = (void *)0x600000;
 
 typedef int (*EntryPoint)();
 
@@ -52,6 +55,7 @@ void * initializeKernelBinary()
 
 int main()
 {	
+	initialize_memory_manager((char*) sampleCodeModuleHeapAddress, HEAP_SIZE);
 	//cargamos la tabla idt nos guardamos la direccion del inicio del programa
 	// en caso de que la necesitemos y luego llamamos al USERLAND
 	load_idt();

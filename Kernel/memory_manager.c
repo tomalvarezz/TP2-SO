@@ -1,5 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <libraryc.h>
+
 #define TRUE 1
 #define FALSE !TRUE
 
@@ -23,8 +25,7 @@ static header *free_node = NULL;
 // Tamaño total de memoria de heap
 uint64_t total_heap_size;
 
-void initialize_memory_manager(char *heap_base, uint64_t heap_size)
-{
+void initialize_memory_manager(char *heap_base, uint64_t heap_size){
     if(heap_base==NULL){
         return;
     }
@@ -72,9 +73,7 @@ void *malloc(uint64_t malloc_bytes){
 
     node_found= TRUE;
 
-    for (current_node = prevptr->data.ptr; node_found; current_node->data.ptr)
-    {
-
+    for (current_node = prevptr->data.ptr; node_found; current_node->data.ptr){
         // Cuando encuentre un bloque de memoria suficientemente grande como para que
         // la memoria solicitada entre hago un segundo chequeo
 
@@ -109,27 +108,17 @@ void *malloc(uint64_t malloc_bytes){
         prevptr= current_node;
     }
     return result;
-
-
 }
 
-void free(void *block)
-{
-
-    if (block == NULL )
-    {
+void free(void *block){
+    if (block == NULL ){
         return;
     }
-
     
     header *free_block, *current_node;
-
-  
     free_block = (header *)block - 1;
-
   
-    if (free_block < base || free_block >= (base + total_heap_size * sizeof(header)))
-    {
+    if (free_block < base || free_block >= (base + total_heap_size * sizeof(header))){
         return;
     }
 
@@ -138,61 +127,74 @@ void free(void *block)
    char external = FALSE;
 
     
-    for (current_node = free_node; !(free_block > current_node && free_block < current_node->data.ptr) && !external; current_node = current_node->data.ptr)
-    {
-
-        
-        if (free_block == current_node || free_block == current_node->data.ptr)
-        {
+    for (current_node = free_node; !(free_block > current_node && free_block < current_node->data.ptr) && !external; current_node = current_node->data.ptr){
+        if (free_block == current_node || free_block == current_node->data.ptr){
             return;
         }
 
         // Se asegura que el nodo que estamos intentando insertar no sea el primero ni el último de la lista
-        if (current_node >= current_node->data.ptr && (free_block > current_node || free_block < current_node->data.ptr))
-        {
+        if (current_node >= current_node->data.ptr && (free_block > current_node || free_block < current_node->data.ptr)){
             external = TRUE;
             
         }
     }
 
   
-    if (!external && (current_node + current_node->data.size > free_block || free_block + free_block->data.size > current_node->data.ptr))
-    {
+    if (!external && (current_node + current_node->data.size > free_block || free_block + free_block->data.size > current_node->data.ptr)){
         return;
     }
 
     // Caso free_block está a la izquierda de donde se tiene que insertar
 
     // Si son iguales sus direcciones, uno los dos bloques de memoria adyacentes
-    if (free_block + free_block->data.size == current_node->data.ptr)
-    {
+    if (free_block + free_block->data.size == current_node->data.ptr){
         free_block->data.size += current_node->data.ptr->data.size;
         free_block->data.ptr = current_node->data.ptr->data.ptr;
 
         // Sino, reemplazo a lo que apunte free_block por current
     }
-    else
-    {
+    else{
         free_block->data.ptr = current_node->data.ptr;
     }
-
     
-    if (current_node + current_node->data.size == free_block)
-    {
+    if (current_node + current_node->data.size == free_block){
         current_node->data.size += free_block->data.size;
-
         current_node->data.ptr = free_block->data.ptr;
-
-       
     }
-    else
-    {
+    else{
         current_node->data.ptr = free_block;
     }
-
   
     free_node = current_node;
 }
 
+void memory_dump(){
+    int block_number = 1;
+    header* first;
+    header* current;
+    first = current = free_node;
+    
+    char flag = TRUE;
+    printf("\nVUELCO DE MEMORIA \n");
+    printf("\nMemoria Total: %d bytes\n\n", (uint32_t)total_heap_size * sizeof(header));
+
+    if (free_node == NULL){
+        printf("\nNo hay bloques de memoria disponibles.\n");
+        return;
+    }
+    printf("Bloques libres:\n\n");
+
+    while (current != first || flag){
+        flag = FALSE;
+        printf("    Bloque numero: %d\n", block_number);
+        printf("    Base:%x\n", (uint64_t)current);
+        printf("    Bytes disponibles: %d\n\n", (int)current->data.size);
+
+        current = current->data.ptr;
+        block_number++;
+    }
+
+    printf("\n");
+}
 
 
