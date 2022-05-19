@@ -8,7 +8,8 @@
 
 //scheduler
 void initialize_process_manager();
-int new_process(/*parametros a definir*/);
+int new_process(void (*entryPoint)(int, char **), int argc, char **argv,
+               int foreground, int *fd);
 void _callTimerTick();
 void *processManager(void *sp);
 

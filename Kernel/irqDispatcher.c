@@ -4,7 +4,7 @@
 
 /*Luego de una interrupcion entre la 20 y 35, pues son las que se encuentran en el PIC.
 En base a dicho codigo llama a la funcion correspondiente*/
-void irqDispatcher(uint64_t irq) {
+void irqDispatcher(uint64_t irq, uint64_t rsp) {
 	switch (irq) {
 		case 0:
 			int_20();
