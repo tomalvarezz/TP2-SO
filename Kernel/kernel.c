@@ -55,6 +55,34 @@ void * initializeKernelBinary()
 	return getStackBase();
 }
 
+void suma(int argc, char *argv[]){
+	while(1){
+		sys_sleep_handler(2000);
+		printf("Estoy en funcion suma\n");
+	}
+}
+
+void resta(int argc, char *argv[]){
+
+	while (1)
+	{
+		sys_sleep_handler(2000);
+		printf("Estoy en funcion resta\n");
+	}
+}
+
+
+void mult(int argc, char *argv[]){
+
+	while (1)
+	{
+		sys_sleep_handler(2000);
+		printf("Estoy en funcion mult %s\n",argv[1]);
+	}
+}
+
+
+
 int main()
 {	
 
@@ -68,10 +96,23 @@ int main()
 
 	//cargamos la tabla idt nos guardamos la direccion del inicio del programa
 	// en caso de que la necesitemos y luego llamamos al USERLAND
-	load_idt();
-	backUpRipRsp((uint64_t *)sampleCodeModuleAddress, getRSP()); 
-	ncClear();
-	((EntryPoint)sampleCodeModuleAddress)();
+	   char* argvsuma[] = {"suma","1","2"};
+		new_process(&suma,1,argvsuma,FOREGROUND,0);
 
-	return 0;
+		char *argvresta[] = {"resta","2","2"};
+		new_process(&resta, 1, argvresta, FOREGROUND, 0);
+
+		char *argvmult[] = {"mult","2","2"};
+		new_process(&mult, 1, argvmult, FOREGROUND, 0);
+       
+
+	   
+
+
+		load_idt();
+		backUpRipRsp((uint64_t *)sampleCodeModuleAddress, getRSP());
+		ncClear();
+		((EntryPoint)sampleCodeModuleAddress)();
+
+		return 0;
 }

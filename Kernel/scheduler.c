@@ -163,8 +163,9 @@ int new_process(void (*entry_point)(int, char **), int argc, char **argv,
 }
 
 static void idle_process(int argc, char **argv) {
-  while (1) {
-    printf("soy el proceso idle \n");
+ while (1) {
+   sys_sleep_handler(2000);
+   printf("soy el proceso idle \n");
   }
 }
 
