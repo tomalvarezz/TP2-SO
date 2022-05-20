@@ -330,3 +330,119 @@ int block_process(uint64_t pid){
 int ready_process(uint64_t pid){
   return set_state(pid, READY);
 }
+
+int kill_current_FG_process(){
+     
+  if (current_process != NULL && current_process->pcb.is_foreground &&
+      current_process->pcb.state == READY)
+  {
+   return kill_process(current_process->pcb.pid);
+  }
+
+  return -1;
+
+}
+
+int get_process_PID(){
+
+  if(current_process!=NULL){
+  return current_process->pcb.pid;
+  }
+  return -1;
+}
+
+int get_current_process_read_FD(){
+  if (current_process != NULL)
+  {
+    return current_process->pcb.fd[0];
+  }
+  return -1;
+}
+
+int get_current_process_write_FD(){
+  if (current_process != NULL)
+  {
+    return current_process->pcb.fd[1];
+  }
+  return -1;
+}
+
+void set_priority(uint64_t pid, int new_priority){
+  if (new_priority < 0)
+  {
+    new_priority = 0;
+  }
+  if (new_priority > MAX_PRIORITY)
+  {
+    new_priority = MAX_PRIORITY;
+  }
+
+  t_process_node *process = get_process(pid);
+
+  if (process != NULL)
+  {
+    process->pcb.priority = new_priority;
+  }
+
+}
+
+int current_process_is_foreground(){
+  if(current_process!=NULL){ 
+  return current_process->pcb.is_foreground;
+}
+ }
+
+ char* print_process_status(int state){
+   switch (state)
+   {
+   case READY:
+     return "READY";
+     break;
+   case BLOCKED:
+     return "BLOCKED";
+   default:
+     return "FINISHED";
+     break;
+   };
+ }
+ 
+ void print_current_process(){
+
+   if(current_process==NULL){
+     return;
+   }
+
+       printf("Name: %s\n",current_process->pcb.name);
+      
+       printf("PID: %d\n",current_process->pcb.pid);
+
+       printf("PPID: %d\n", current_process->pcb.ppid);
+
+       printf("%s\n", current_process->pcb.is_foreground > 0 ? "FOREGROUND" : "BACKGROUND");
+
+       printf("RSP: %x\n",current_process->pcb.RSP);
+
+       printf("RBP: %x\n", current_process->pcb.RBP);
+
+       printf("Priority: %d\n",current_process->pcb.priority);
+
+       printf("State: %s\n\n",print_process_status(current_process->pcb.state));
+ }
+
+ void wait(int pid){
+   //if(current_process!=NULL){
+     //current_process->pcb.state=BLOCKED;
+   //}
+
+   t_process_node *process = getProcess(pid);
+   if (process)
+   {
+     process->pcb.is_foreground = 1;
+     block_process(current_process->pcb.pid);
+   }
+ }
+
+ void yield(){
+   cycles_left = 0;
+   callTimerTick();
+ }

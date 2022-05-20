@@ -20,19 +20,19 @@ int block_process(uint64_t pid);
 int ready_process(uint64_t pid);
 //Hecho hasta acá
 
-void kill_current_FG_process();
+int kill_current_FG_process();
 
 //getters
 int get_process_PID();
-int get_current_process_input_FD();
-int get_current_process_output_FD();
+int get_current_process_read_FD();
+int get_current_process_write_FD();
 
 //priority
 void set_priority(uint64_t pid, int new_priority);
 int current_process_is_foreground();
 
 //printers
-void print_process_status();
+char* print_process_status();
 void print_current_process();
 
 //sync
