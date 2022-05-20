@@ -20,6 +20,7 @@ GLOBAL get_saved_registers
 EXTERN irqDispatcher
 EXTERN irqDispatcherSoftware
 EXTERN exceptionDispatcher
+EXTERN scheduler
 
 SECTION .text
 
@@ -213,8 +214,10 @@ _irq00Handler:
 	mov rsi, rsp
 	call irqDispatcher
 
+	;Usamos rsp como parámetro para scheduler en rdi
+	;Como se devuelve en rax, hacemos el mov correspondiente
 	mov rdi,rsp
-	;Aqui llamariamos a la funcion que devuelve el SP del proximo proceso
+	call scheduler
 	mov rsp, rax
 
 	;Send EOF (end of interrupt) de clase 

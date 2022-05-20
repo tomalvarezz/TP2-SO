@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <scheduler.h>
 #include <libraryc.h>
+#include <interrupts.h>
 
 static void *const sampleCodeModuleAddress = (void *)0x400000;
 
@@ -48,10 +49,16 @@ static void initialize_process_stack_frame(void (*entryPoint)(int, char **), int
 static int initialize_pcb(PCB *PCB, char *name, uint8_t foreground, int *fd);
 static int get_arguments(char **to, char **from, int count);
 static void wrapper(void (*entryPoint)(int, char **), int argc, char **argv);
+static void free_process(t_process_node *process);
+static t_process_node *get_process(uint64_t pid);
+static void end();
 
 
 void initialize_scheduler() {
   processes = malloc(sizeof(t_process_list));
+
+  //Preguntar si hay que hacer un handler para error
+  //Si falla el initialize scheduler se rompe todo
   if (processes == NULL) {
     return;
   }
@@ -63,7 +70,6 @@ void initialize_scheduler() {
 
   char *argv[] = {"Proceso IDLE inicial"};
   new_process(&idle_process, 1, argv, BACKGROUND, 0);
-  
   base_process = dequeue_process(processes);
 }
 
@@ -90,6 +96,8 @@ void *scheduler(void *sp){
     current_process = dequeue_process(processes);
     
     while (current_process->pcb.state != READY) {
+      //No habría que realizar los mismos chequeos que más arriba 
+      //para ver si tiene que desbloquear o no un proceso padre?
       if (current_process->pcb.state == FINISHED) {
         free_process(current_process);
       }
@@ -145,7 +153,7 @@ int new_process(void (*entry_point)(int, char **), int argc, char **argv,
 
   queue_process(processes, new_process);
 
-  //Bloquear al proceso padre si estamos en FG y padre
+  //Bloquear al proceso padre si estamos en FG y tiene proceso padre
   //Aun no implementado
   /*if (new_process->pcb.is_foreground && new_process->pcb.ppid) {
     block_process(new_process->pcb.ppid);
@@ -157,7 +165,6 @@ int new_process(void (*entry_point)(int, char **), int argc, char **argv,
 static void idle_process(int argc, char **argv) {
   while (1) {
     printf("soy el proceso idle \n");
-    _hlt();
   }
 }
 
@@ -212,8 +219,7 @@ static int get_arguments(char **to, char **from, int count) {
 }
 
 static void end() {
-  //Función que termina un proceso, aun no implementado
-  //(void)killProcess(current_process->pcb.pid);
+  kill_process(current_process->pcb.pid);
   callTimerTick();
 }
 
@@ -258,4 +264,68 @@ static void free_process(t_process_node *process) {
   free(process->pcb.argv);
   free((void *)((char *)process->pcb.RBP - SIZE_OF_STACK + 1));
   free((void *)process);
+}
+
+//new_state puede ser READY, BLOCKED O FINISHED
+int set_state(uint64_t pid, int new_state){
+   t_process_node *process = get_process(pid);
+
+  if (process == NULL || process->pcb.state == FINISHED) {
+    return -1;
+  }
+
+  if (process == current_process) {
+    process->pcb.state = new_state;
+    return process->pcb.pid;
+  }
+
+  //Chequeos para ver si hay que incrementar o no ready_size
+  if (process->pcb.state != READY && new_state == READY) {
+    processes->ready_size++;
+  }
+  if (process->pcb.state == READY && new_state != READY) {
+    processes->ready_size--;
+  }
+
+  process->pcb.state = new_state;
+
+  return process->pcb.pid;
+}
+
+static t_process_node *get_process(uint64_t pid) {
+  //Si el proceso es el current lo retorno directamente
+  if (current_process != NULL && current_process->pcb.pid == pid) {
+    return current_process;
+  }
+
+  t_process_node *process = processes->first;
+  while (process != NULL) {
+    if (process->pcb.pid == pid) {
+      return process;
+    }
+    process = (t_process_node *)process->next;
+  }
+  return NULL;
+}
+
+int kill_process(uint64_t pid){
+  int PID_to_return=set_state(pid, FINISHED);
+
+  if(current_process!=NULL &&  pid==current_process->pcb.pid){
+    callTimerTick();
+  }
+
+  return PID_to_return;
+}
+int block_process(uint64_t pid){
+  int PID_to_return=set_state(pid, BLOCKED);
+
+  if(current_process!=NULL &&  pid==current_process->pcb.pid){
+    callTimerTick();
+  }
+
+  return PID_to_return;
+}
+int ready_process(uint64_t pid){
+  return set_state(pid, READY);
 }

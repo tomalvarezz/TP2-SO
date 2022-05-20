@@ -2,6 +2,7 @@
 #include <exceptions.h>
 #include <libraryc.h>
 #include <syscalls_management.h>
+#include <naiveConsole.h>
 
 #define ZERO_EXCEPTION_ID 0
 #define INVALID_OP_CODE_ID 6

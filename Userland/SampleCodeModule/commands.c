@@ -27,8 +27,6 @@ static void printMemory();
 static void zeroExceptionCommand();
 static void invalidOpCodeExceptionCommand();
 static void bringTime(char *finalStr);
-static int isAlpha(char letter);
-static int isNum(char letter);
 
 /*devuelve el numero de comando que se encuentra en el vector de strings 'coms' en caso de que el comando sea correcto, caso contrario retornara COM_NUM*/
 int checkCommand(char* com){
@@ -203,14 +201,4 @@ static void bringTime(char *finalStr) {
         strCat(finalStr,"0");
     }
     strCat(finalStr, secStr);
-}
-
-/*Devuelve 1 si el caracter es una letra y 0 en caso contrario*/
-static int isAlpha(char letter){
-     return (letter>='a' && letter<='z') || (letter>='A' && letter<='Z'); 
- }
-
-/*Devuelve 1 si el caracter es un numero y 0 en caso contrario*/
-static int isNum(char letter){
-    return (letter>='1' && letter<='9'); 
 }

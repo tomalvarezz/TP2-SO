@@ -5,6 +5,8 @@
 #include <idtLoader.h>
 #include <exceptions.h>
 #include <memory_manager.h>
+#include <scheduler.h>
+#include <libraryc.h>
 
 #define STDIN 0
 #define STDOUT 1
@@ -55,7 +57,15 @@ void * initializeKernelBinary()
 
 int main()
 {	
+
+	ncClear();
+	printf("Entrando a kernel");
 	initialize_memory_manager((char*) sampleCodeModuleHeapAddress, HEAP_SIZE);
+	printf("Inicializado memory_manager");
+
+	initialize_scheduler();
+	printf("Inicializado scheduler");
+
 	//cargamos la tabla idt nos guardamos la direccion del inicio del programa
 	// en caso de que la necesitemos y luego llamamos al USERLAND
 	load_idt();

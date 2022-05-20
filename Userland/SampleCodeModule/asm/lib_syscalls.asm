@@ -6,7 +6,6 @@ GLOBAL sys_time
 GLOBAL sys_clear
 GLOBAL sys_get_registers
 GLOBAL sys_get_memory
-
 GLOBAL sys_malloc
 GLOBAL sys_free
 GLOBAL sys_sleep

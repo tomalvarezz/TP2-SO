@@ -248,7 +248,7 @@ int pow(int x, unsigned int y)
 
 void *malloc(uint64_t size)
 {
-    return sys_malloc(size);
+    return (void *)sys_malloc(size);
 }
 
 void free(void *address)
