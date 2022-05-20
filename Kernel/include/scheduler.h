@@ -7,11 +7,11 @@
 #define BACKGROUND 0
 
 //scheduler
-void initialize_process_manager();
+void initialize_scheduler();
 int new_process(void (*entryPoint)(int, char **), int argc, char **argv,
                int foreground, int *fd);
-void _callTimerTick();
-void *processManager(void *sp);
+void callTimerTick();
+void *scheduler(void *sp);
 
 //estado de proceso
 int kill_process(uint64_t pid);

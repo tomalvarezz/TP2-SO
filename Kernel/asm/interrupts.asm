@@ -221,7 +221,7 @@ _irq00Handler:
 	mov al, 20h
 	out 20h, al
 
-	popStateExtra
+	popAllState
 	iretq
 
 ;Keyboard

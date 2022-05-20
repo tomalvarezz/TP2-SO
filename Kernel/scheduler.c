@@ -1,8 +1,5 @@
 #include <stdint.h>
 #include <scheduler.h>
-#include <scheduler_queue.h>
-#include <interrupts.h>
-#include <memory_manager.h>
 #include <libraryc.h>
 
 static void *const sampleCodeModuleAddress = (void *)0x400000;
@@ -12,7 +9,6 @@ static uint64_t current_PID = 0;
 static uint64_t cycles_left;
 static t_process_list *processes;
 static t_process_node *base_process;
-
 
 #define SIZE_OF_STACK (4 * 1024)
 #define BACKGROUND_PRIORITY_DEFAULT 1
@@ -44,8 +40,9 @@ typedef struct {
   uint64_t rsp;
   uint64_t ss;
   uint64_t base;
-} t_stackFrame;
+} t_stack_frame;
 
+static uint64_t get_PID();
 static void idle_process(int argc, char **argv);
 static void initialize_process_stack_frame(void (*entryPoint)(int, char **), int argc, char **argv, void *rbp);
 static int initialize_pcb(PCB *PCB, char *name, uint8_t foreground, int *fd);
@@ -53,23 +50,61 @@ static int get_arguments(char **to, char **from, int count);
 static void wrapper(void (*entryPoint)(int, char **), int argc, char **argv);
 
 
-void initialize_process_manager() {
-  
+void initialize_scheduler() {
   processes = malloc(sizeof(t_process_list));
   if (processes == NULL) {
     return;
   }
-  
   
   processes->first = NULL;
   processes->last = processes->first;
   processes->ready_size = 0;
   processes->size = 0;
 
-  char *argv[] = {"Initial Idle Process"};
+  char *argv[] = {"Proceso IDLE inicial"};
   new_process(&idle_process, 1, argv, BACKGROUND, 0);
   
   base_process = dequeue_process(processes);
+}
+
+void *scheduler(void *sp){
+  if (current_process != NULL) {
+    if (current_process->pcb.state == READY && cycles_left > 0) {
+      cycles_left--;
+      return sp;
+    }
+
+    current_process->pcb.RSP = sp;
+
+    if (current_process->pcb.pid != base_process->pcb.pid) {
+      if (current_process->pcb.state == FINISHED) {
+        /*llamo proceso padre si lo tuviera para desbloquearlo, aun sin implementar*/
+        free_process(current_process);
+      } else {
+        queue_process(processes, current_process);
+      }
+    }
+  }
+
+  if (processes->ready_size > 0) {
+    current_process = dequeue_process(processes);
+    
+    while (current_process->pcb.state != READY) {
+      if (current_process->pcb.state == FINISHED) {
+        free_process(current_process);
+      }
+      if (current_process->pcb.state == BLOCKED) {
+        queue_process(processes, current_process);
+      }
+      current_process = dequeue_process(processes);
+    }
+  } else {
+    current_process = base_process;
+  }
+
+  cycles_left = current_process->pcb.priority;
+
+  return current_process->pcb.RSP;
 }
 
 int new_process(void (*entry_point)(int, char **), int argc, char **argv,
@@ -88,7 +123,6 @@ int new_process(void (*entry_point)(int, char **), int argc, char **argv,
     free(new_process);
     return -1;
   }
-
   
   char **arguments = malloc(sizeof(char *) * argc);
   if (arguments == NULL) {
@@ -111,9 +145,11 @@ int new_process(void (*entry_point)(int, char **), int argc, char **argv,
 
   queue_process(processes, new_process);
 
-  if (new_process->pcb.is_foreground && new_process->pcb.ppid) {
-    blockProcess(new_process->pcb.ppid);
-  }
+  //Bloquear al proceso padre si estamos en FG y padre
+  //Aun no implementado
+  /*if (new_process->pcb.is_foreground && new_process->pcb.ppid) {
+    block_process(new_process->pcb.ppid);
+  }*/
 
   return new_process->pcb.pid;
 }
@@ -125,11 +161,12 @@ static void idle_process(int argc, char **argv) {
   }
 }
 
-static int initialize_pcb(PCB *PCB, char *name,uint8_t foreground, int *fd){
+static uint64_t get_PID() { return current_PID++; }
 
-  strcpy(PCB->name, name);
+static int initialize_pcb(PCB *PCB, char *name,uint8_t foreground, int *fd){
+  strCpy(PCB->name, name);
   
-  PCB->pid = getPID();
+  PCB->pid = get_PID();
 
   PCB->ppid = (current_process == NULL ? 0 : current_process->pcb.pid);
 
@@ -153,13 +190,13 @@ static int initialize_pcb(PCB *PCB, char *name,uint8_t foreground, int *fd){
 
   PCB->RBP = (void *)((char *)PCB->RBP + SIZE_OF_STACK - 1);
 
-  PCB->RSP = (void *)((t_stackFrame *)PCB->RBP - 1);
+  PCB->RSP = (void *)((t_stack_frame *)PCB->RBP - 1);
   return 0;
 }
 
 static int get_arguments(char **to, char **from, int count) {
   for (int i = 0; i < count; i++) {
-    to[i] = malloc(sizeof(char) * (strlen(from[i]) + 1));
+    to[i] = malloc(sizeof(char) * (strLen(from[i]) + 1));
 
     if (to[i] == NULL) {
       i--;
@@ -169,14 +206,25 @@ static int get_arguments(char **to, char **from, int count) {
       }
       return -1;
     }
-    strcpy(to[i], from[i]);
+    strCpy(to[i], from[i]);
   }
   return 0;
 }
 
+static void end() {
+  //Función que termina un proceso, aun no implementado
+  //(void)killProcess(current_process->pcb.pid);
+  callTimerTick();
+}
+
+static void wrapper(void (*entryPoint)(int, char **), int argc, char **argv) {
+  entryPoint(argc, argv);
+  end();
+}
+
 static void initialize_process_stack_frame(void (*entryPoint)(int, char **),
                                         int argc, char **argv, void *rbp) {
-  t_stackFrame *stackFrame = (t_stackFrame *)rbp - 1;
+  t_stack_frame *stackFrame = (t_stack_frame *)rbp - 1;
 
   stackFrame->gs = 0x001;
   stackFrame->fs = 0x002;
@@ -203,13 +251,11 @@ static void initialize_process_stack_frame(void (*entryPoint)(int, char **),
   stackFrame->base = 0x000;
 }
 
-
-static void end() {
-  (void)killProcess(current_process->pcb.pid);
-  _callTimerTick();
-}
-
-static void wrapper(void (*entryPoint)(int, char **), int argc, char **argv) {
-  entryPoint(argc, argv);
-  end();
+static void free_process(t_process_node *process) {
+  for (int i = 0; i < process->pcb.argc; i++) {
+    free(process->pcb.argv[i]);
+  }
+  free(process->pcb.argv);
+  free((void *)((char *)process->pcb.RBP - SIZE_OF_STACK + 1));
+  free((void *)process);
 }
