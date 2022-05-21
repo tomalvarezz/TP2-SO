@@ -7,48 +7,48 @@
 
 typedef long Align;
 
-typedef union header{
-    struct{
-        union header *ptr;
+typedef union header {
+    struct {
+        union header* ptr;
         uint64_t size;
-    }data;
-    
+    } data;
+
     Align x;
 
-}header;
+} header;
 
-//Nodos ocupados
-static header *base;
-//Nodos libres
-static header *free_node = NULL;
+// Nodos ocupados
+static header* base;
+// Nodos libres
+static header* free_node = NULL;
 
 // Tamaño total de memoria de heap
 uint64_t total_heap_size;
 
-void initialize_memory_manager(char *heap_base, uint64_t heap_size){
-    if(heap_base==NULL){
+void initialize_memory_manager(char* heap_base, uint64_t heap_size) {
+    if (heap_base == NULL) {
         return;
     }
 
-    total_heap_size = (heap_size + sizeof(header)-1)/sizeof(header) + 1;
+    total_heap_size = (heap_size + sizeof(header) - 1) / sizeof(header) + 1;
 
-    free_node = base=(header*)heap_base;
+    free_node = base = (header*)heap_base;
 
     free_node->data.size = total_heap_size;
 
-    free_node->data.ptr= free_node;
+    free_node->data.ptr = free_node;
 }
 
-void *malloc(uint64_t malloc_bytes){
-    if(malloc_bytes == 0){
+void* malloc(uint64_t malloc_bytes) {
+    if (malloc_bytes == 0) {
         return NULL;
     }
 
-    //2 nodos para iterar sobre la lista hasta encontrar un nodo que satisfaga el espacio requerido.
+    // 2 nodos para iterar sobre la lista hasta encontrar un nodo que satisfaga el espacio requerido.
 
     header *current_node, *prevptr;
 
-    void *result;
+    void* result;
 
     char node_found;
 
@@ -69,122 +69,116 @@ void *malloc(uint64_t malloc_bytes){
 
     uint64_t malloc_units = (malloc_bytes + sizeof(header) - 1) / sizeof(header) + 1;
 
-    prevptr= free_node;
+    prevptr = free_node;
 
-    node_found= TRUE;
+    node_found = TRUE;
 
-    for (current_node = prevptr->data.ptr; node_found; current_node->data.ptr){
+    for (current_node = prevptr->data.ptr; node_found; current_node->data.ptr) {
         // Cuando encuentre un bloque de memoria suficientemente grande como para que
         // la memoria solicitada entre hago un segundo chequeo
 
-        
-    // Si la memoria es exacta, asigno al previo el actual
+        // Si la memoria es exacta, asigno al previo el actual
 
-        if(current_node->data.size >= malloc_units){
-            if(current_node->data.size == malloc_units){
+        if (current_node->data.size >= malloc_units) {
+            if (current_node->data.size == malloc_units) {
                 prevptr->data.ptr = current_node->data.ptr;
 
-            }else{
+            } else {
 
                 // Si fuera mayor, recorto la memoria las nunits que voy a usar
                 // Desplazo el current la nueva cantidad de tamaño que obtuve
                 // Le asigno al nodo current como data.size el tamaño solicitado
 
                 current_node->data.size -= malloc_units;
-                current_node+= current_node->data.size;
+                current_node += current_node->data.size;
                 current_node->data.size = malloc_units;
             }
 
             free_node = prevptr;
 
-            result= current_node + 1;
+            result = current_node + 1;
 
             node_found = FALSE;
 
-        }  //si no encuentra bloque , devueve null(final de la lista)
-        if(current_node == free_node){
+        } // si no encuentra bloque , devueve null(final de la lista)
+        if (current_node == free_node) {
             return NULL;
         }
-        prevptr= current_node;
+        prevptr = current_node;
     }
     return result;
 }
 
-void free(void *block){
-    if (block == NULL ){
+void free(void* block) {
+    if (block == NULL) {
         return;
     }
-    
+
     header *free_block, *current_node;
-    free_block = (header *)block - 1;
-  
-    if (free_block < base || free_block >= (base + total_heap_size * sizeof(header))){
+    free_block = (header*)block - 1;
+
+    if (free_block < base || free_block >= (base + total_heap_size * sizeof(header))) {
         return;
     }
 
     block = NULL;
 
-   char external = FALSE;
+    char external = FALSE;
 
-    
-    for (current_node = free_node; !(free_block > current_node && free_block < current_node->data.ptr) && !external; current_node = current_node->data.ptr){
-        if (free_block == current_node || free_block == current_node->data.ptr){
+    for (current_node = free_node; !(free_block > current_node && free_block < current_node->data.ptr) && !external; current_node = current_node->data.ptr) {
+        if (free_block == current_node || free_block == current_node->data.ptr) {
             return;
         }
 
         // Se asegura que el nodo que estamos intentando insertar no sea el primero ni el último de la lista
-        if (current_node >= current_node->data.ptr && (free_block > current_node || free_block < current_node->data.ptr)){
+        if (current_node >= current_node->data.ptr && (free_block > current_node || free_block < current_node->data.ptr)) {
             external = TRUE;
-            
         }
     }
 
-  
-    if (!external && (current_node + current_node->data.size > free_block || free_block + free_block->data.size > current_node->data.ptr)){
+    if (!external && (current_node + current_node->data.size > free_block || free_block + free_block->data.size > current_node->data.ptr)) {
         return;
     }
 
     // Caso free_block está a la izquierda de donde se tiene que insertar
 
     // Si son iguales sus direcciones, uno los dos bloques de memoria adyacentes
-    if (free_block + free_block->data.size == current_node->data.ptr){
+    if (free_block + free_block->data.size == current_node->data.ptr) {
         free_block->data.size += current_node->data.ptr->data.size;
         free_block->data.ptr = current_node->data.ptr->data.ptr;
 
         // Sino, reemplazo a lo que apunte free_block por current
-    }
-    else{
+    } else {
         free_block->data.ptr = current_node->data.ptr;
     }
-    
-    if (current_node + current_node->data.size == free_block){
+
+    if (current_node + current_node->data.size == free_block) {
         current_node->data.size += free_block->data.size;
         current_node->data.ptr = free_block->data.ptr;
-    }
-    else{
+    } else {
         current_node->data.ptr = free_block;
     }
-  
+
     free_node = current_node;
 }
 
-void memory_dump(){
+void memory_dump() {
     int block_number = 1;
     header* first;
     header* current;
     first = current = free_node;
-    
+
     char flag = TRUE;
     printf("\nVUELCO DE MEMORIA \n");
     printf("\nMemoria Total: %d bytes\n\n", (uint32_t)total_heap_size * sizeof(header));
 
-    if (free_node == NULL){
+    if (free_node == NULL) {
         printf("\nNo hay bloques de memoria disponibles.\n");
         return;
     }
     printf("Bloques libres:\n\n");
 
-    while (current != first || flag){
+    while (current != first || flag) {
         flag = FALSE;
         printf("    Bloque numero: %d\n", block_number);
         printf("    Base:%x\n", (uint64_t)current);
@@ -196,5 +190,3 @@ void memory_dump(){
 
     printf("\n");
 }
-
-

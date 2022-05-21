@@ -12,6 +12,7 @@ static uint64_t registers[REGISTERS];
 static int canPrintRegisters=0;
 
 /*En base a el codigo de syscall, que se encuentra en rax, se llama a la funcion del handler correspondiente*/
+//Agregar más registros para poder realizar la syscall new_process
 uint64_t syscall_handler(uint64_t rax, uint64_t rdi,uint64_t rsi, uint64_t rdx, uint64_t rsp){
 
     switch (rax)
@@ -36,6 +37,7 @@ uint64_t syscall_handler(uint64_t rax, uint64_t rdi,uint64_t rsi, uint64_t rdx, 
         sys_get_memory_handler((uint8_t*)rdi ,(uint64_t*)rsi);
         break;    
 
+    //6,7,8 memory_manager syscalls
     case 6: 
         return malloc((uint64_t)rdi);
 
@@ -44,12 +46,21 @@ uint64_t syscall_handler(uint64_t rax, uint64_t rdi,uint64_t rsi, uint64_t rdx, 
         break;
 
     case 8:
+        memory_dump();
         break;
     
     case 9:
         return sys_sleep_handler(rdi);
 
+    //10, scheduler syscalls
     case 10:
+        return new_process((void (entryPoint)(int, char**))rdi, ());
+        break;
+
+    case 11:
+        break;
+    
+    case 12:
         break;
         
     default:

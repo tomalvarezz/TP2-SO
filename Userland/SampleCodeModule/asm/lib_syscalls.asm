@@ -8,6 +8,7 @@ GLOBAL sys_get_registers
 GLOBAL sys_get_memory
 GLOBAL sys_malloc
 GLOBAL sys_free
+GLOBAL sys_memory_dump
 GLOBAL sys_sleep
 GLOBAL sys_invalid_op_code
 
@@ -100,6 +101,17 @@ sys_free:
     pop rbp
     ret
 
+sys_memory_dump:
+    push rbp
+    mov rbp, rsp
+    push rbx
+    mov rax, 0x08
+    int 80h
+    pop rbx
+    mov rsp, rbp
+    pop rbp
+    ret
+
 sys_sleep:
 	push rbp
 	mov rbp, rsp
@@ -110,6 +122,8 @@ sys_sleep:
 	mov rsp, rbp
 	pop rbp
 	ret
+
+
 
 sys_invalid_op_code:
 	UD2

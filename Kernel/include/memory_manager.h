@@ -6,4 +6,6 @@
 void initialize_memory_manager(char *heap_base, uint64_t heap_size);
 void *malloc(uint64_t malloc_bytes);
 void free(void *block);
+void memory_dump();
+
 #endif
