@@ -2,6 +2,7 @@ GLOBAL cpuVendor
 GLOBAL RTC
 GLOBAL getRSP
 GLOBAL callTimerTick
+GLOBAL exchange
 
 section .text
 	
@@ -48,4 +49,13 @@ getRSP:
 
 callTimerTick:
 	int 20h
+	ret
+
+exchange:
+	;guardo 1 en rax, para poder utilizar el rax para xchg
+	mov rax, rsi
+	;en rdi está lock, [rdi] el valor de lock
+	xchg [rdi], rax		
+	;como rax se va a devolver, devuelve 1 para acquire
+	;devuelve 0 para release
 	ret

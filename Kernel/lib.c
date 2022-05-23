@@ -48,3 +48,11 @@ void * memcpy(void * destination, const void * source, uint64_t length)
 
 	return destination;
 }
+
+void acquire(int *lock) {
+  while (exchange(lock, 1) != 0);
+}
+
+void release(int *lock) { 
+  exchange(lock, 0); 
+}

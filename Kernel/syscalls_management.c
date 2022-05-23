@@ -54,7 +54,6 @@ uint64_t syscall_handler(uint64_t rax, uint64_t rdi,uint64_t rsi, uint64_t rdx, 
 
     //10, scheduler syscalls
     case 10:
-        return new_process((void (entryPoint)(int, char**))rdi, ());
         break;
 
     case 11:
