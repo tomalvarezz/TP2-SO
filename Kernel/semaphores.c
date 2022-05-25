@@ -6,6 +6,23 @@
 #define ERROR -1
 #define OK 0
 
+typedef struct t_semaphore {
+    uint32_t id;
+    uint64_t value;
+    int blocked_processes[MAX_BLOCKED_PROCESSES];
+    uint16_t blocked_processes_count;
+    uint16_t listening_processes;
+    struct t_semaphore* next;
+    int lock;
+} t_semaphore;
+
+// Para implementar similar a como tenemos list de processes
+typedef struct t_semaphore_list {
+    t_semaphore* first;
+    t_semaphore* last;
+} t_semaphore_list;
+
+
 t_semaphore* semaphores;
 
 static t_semaphore* get_semaphore(uint32_t id);

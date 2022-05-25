@@ -56,8 +56,6 @@ static void end();
 void initialize_scheduler() {
     processes = malloc(sizeof(t_process_list));
 
-    // Preguntar si hay que hacer un handler para error
-    // Si falla el initialize scheduler se rompe todo
     if (processes == NULL) {
         return;
     }
@@ -379,6 +377,7 @@ int current_process_is_foreground() {
     if (current_process != NULL) {
         return current_process->pcb.is_foreground;
     }
+    return 0;
 }
 
 char* print_process_status(int state) {
@@ -418,12 +417,8 @@ void print_current_process() {
 }
 
 void wait(int pid) {
-    // if(current_process!=NULL){
-    // current_process->pcb.state=BLOCKED;
-    //}
-
     t_process_node* process = get_process(pid);
-    if (process) {
+    if (process != NULL) {
         process->pcb.is_foreground = 1;
         block_process(current_process->pcb.pid);
     }

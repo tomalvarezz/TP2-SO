@@ -7,6 +7,8 @@
 #include <memory_manager.h>
 #include <scheduler.h>
 #include <libraryc.h>
+#include <test_processes.h>
+#include <test_priority.h>
 
 
 #define STDIN 0
@@ -57,7 +59,15 @@ int main() {
     printf("Inicializado memory_manager\n");
 
     initialize_scheduler();
-    printf("Inicializado scheduler");
+    printf("Inicializado scheduler\n");
+
+    test_processes();
+
+    printf("Testeado processes\n");
+
+    test_priority();
+
+    printf("Testeado priority\n");
 
     load_idt();
     backUpRipRsp((uint64_t*)sampleCodeModuleAddress, getRSP());
