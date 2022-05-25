@@ -7,7 +7,6 @@
 #define IN_USE 1
 #define EMPTY 0
 
-static t_pipe pipes[MAX_PIPES];
 
 static int initial_sem = 1000;
 
@@ -19,6 +18,8 @@ typedef struct t_pipe {
     int write_sem, read_sem;
     int state;
 } t_pipe;
+
+static t_pipe pipes[MAX_PIPES];
 
 static int create_pipe(int id);
 static int get_new_index();

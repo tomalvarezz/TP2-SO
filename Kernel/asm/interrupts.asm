@@ -18,7 +18,7 @@ GLOBAL _exception6Handler
 GLOBAL get_saved_registers
 
 EXTERN irqDispatcher
-EXTERN irqDispatcherSoftware
+EXTERN syscall_handler
 EXTERN exceptionDispatcher
 EXTERN scheduler
 
@@ -113,14 +113,14 @@ SECTION .text
 %endmacro
 
 ;Macro para las irq de software
-%macro irqHandlerMasterSoftware 1
-	mov rcx, rax ;movemos el contenido de rax a rcx que va a ser el codigo de syscall en caso de int80
-	mov r8, %1  ;Pasaje de parametro
-	mov r9, rsp ;pasaje de stackFrame
-	call irqDispatcherSoftware
+; %macro irqHandlerMasterSoftware 1
+; 	mov rcx, rax ;movemos el contenido de rax a rcx que va a ser el codigo de syscall en caso de int80
+; 	mov r8, %1  ;Pasaje de parametro
+; 	mov r9, rsp ;pasaje de stackFrame
+; 	call irqDispatcherSoftware
 
-	iretq
-%endmacro
+; 	iretq
+; %endmacro
 
 
 
@@ -246,10 +246,23 @@ _irq04Handler:
 ;USB
 _irq05Handler:
 	irqHandlerMaster 5
-	
+
+;Macro para las irq de software
+; %macro irqHandlerMasterSoftware 1
+; 	mov rcx, rax ;movemos el contenido de rax a rcx que va a ser el codigo de syscall en caso de int80
+; 	mov r8, %1  ;Pasaje de parametro
+; 	mov r9, rsp ;pasaje de stackFrame
+; 	call irqDispatcherSoftware
+
+; 	iretq
+; %endmacro
+
 ;software outage (int 80h)
 _irq80Handler:
-	irqHandlerMasterSoftware 80 
+	mov r9, rax
+	call syscall_handler
+
+	iretq
 
 
 ;Zero Division Exception
