@@ -10,7 +10,6 @@
 #include <test_processes.h>
 #include <test_priority.h>
 
-
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
@@ -52,27 +51,16 @@ void* initializeKernelBinary() {
 }
 
 int main() {
-
     ncClear();
-    printf("Entrando a kernel\n");
     initialize_memory_manager((char*)sampleCodeModuleHeapAddress, HEAP_SIZE);
-    printf("Inicializado memory_manager\n");
-
     initialize_scheduler();
-    printf("Inicializado scheduler\n");
 
-    test_processes();
+    backUpRipRsp((uint64_t*)sampleCodeModuleAddress, getRSP());
 
-    printf("Testeado processes\n");
-
-    test_priority();
-
-    printf("Testeado priority\n");
+    char* argv[] = {"Userland Init"};
+    new_process(sampleCodeModuleAddress, 1, argv, FOREGROUND, 0);
 
     load_idt();
-    backUpRipRsp((uint64_t*)sampleCodeModuleAddress, getRSP());
-    ncClear();
-    ((EntryPoint)sampleCodeModuleAddress)();
 
     return 0;
 }
