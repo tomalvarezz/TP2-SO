@@ -52,6 +52,8 @@ static void wrapper(void (*entryPoint)(int, char**), int argc, char** argv);
 static void free_process(t_process_node* process);
 static t_process_node* get_process(uint64_t pid);
 static void end();
+static char* status_to_print();
+static void print_process(t_process_node* node);
 
 void initialize_scheduler() {
     processes = malloc(sizeof(t_process_list));
@@ -358,7 +360,7 @@ int get_current_process_write_FD() {
     return -1;
 }
 
-void set_priority(uint64_t pid, int new_priority) {
+int set_priority(uint64_t pid, int new_priority) {
     if (new_priority < 0) {
         new_priority = 0;
     }
@@ -370,7 +372,9 @@ void set_priority(uint64_t pid, int new_priority) {
 
     if (process != NULL) {
         process->pcb.priority = new_priority;
+        return pid;
     }
+    return -1;
 }
 
 int current_process_is_foreground() {
@@ -380,7 +384,7 @@ int current_process_is_foreground() {
     return 0;
 }
 
-char* print_process_status(int state) {
+static char* status_to_print(int state) {
     switch (state) {
         case READY:
             return "READY";
@@ -393,35 +397,39 @@ char* print_process_status(int state) {
     };
 }
 
-void print_current_process() {
+void print_processes_status() {
+    if (current_process != NULL) {
+        print_process(current_process);
+    }
 
+    print_process(base_process);
+
+    t_process_node* to_print = processes->first;
+    while (to_print != NULL) {
+        print_process(to_print);
+        to_print = to_print->next;
+    }
+}
+
+void print_current_process() {
     if (current_process == NULL) {
         return;
     }
-
-    printf("Name: %s\n", current_process->pcb.name);
-
-    printf("PID: %d\n", current_process->pcb.pid);
-
-    printf("PPID: %d\n", current_process->pcb.ppid);
-
-    printf("%s\n", current_process->pcb.is_foreground > 0 ? "FOREGROUND" : "BACKGROUND");
-
-    printf("RSP: %x\n", current_process->pcb.RSP);
-
-    printf("RBP: %x\n", current_process->pcb.RBP);
-
-    printf("Priority: %d\n", current_process->pcb.priority);
-
-    printf("State: %s\n\n", print_process_status(current_process->pcb.state));
+    print_process(current_process);
 }
 
-void wait(int pid) {
-    t_process_node* process = get_process(pid);
-    if (process != NULL) {
-        process->pcb.is_foreground = 1;
-        block_process(current_process->pcb.pid);
+static void print_process(t_process_node* node) {
+    if (node == NULL) {
+        return;
     }
+
+    printf("Name: %s\n", node->pcb.name);
+    printf("PID: %d\n", node->pcb.pid);
+    printf("%s\n", node->pcb.is_foreground > 0 ? "FOREGROUND" : "BACKGROUND");
+    printf("RSP: %x\n", node->pcb.RSP);
+    printf("RBP: %x\n", node->pcb.RBP);
+    printf("Priority: %d\n", node->pcb.priority);
+    printf("State: %s\n\n", status_to_print(node->pcb.state));
 }
 
 void yield() {

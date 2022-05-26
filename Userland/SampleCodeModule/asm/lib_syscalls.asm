@@ -10,6 +10,16 @@ GLOBAL sys_malloc
 GLOBAL sys_free
 GLOBAL sys_memory_dump
 GLOBAL sys_sleep
+GLOBAL sys_new_process
+GLOBAL sys_kill_process
+GLOBAL sys_block_process
+GLOBAL sys_ready_process
+GLOBAL sys_get_process_pid
+GLOBAL sys_set_priority
+GLOBAL sys_processes_status
+GLOBAL sys_current_process_status
+GLOBAL sys_yield
+
 GLOBAL sys_invalid_op_code
 
 ;Cabe aclarar que en todas las funciones se realiza el armado y desarmado del stackFrame, el cual no es extrictamente necesario
@@ -123,7 +133,104 @@ sys_sleep:
 	pop rbp
 	ret
 
+sys_new_process:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x0A
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
 
+sys_kill_process:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x0B
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_block_process:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x0C
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_ready_process:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x0D
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_get_process_pid:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x0E
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_set_priority:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x0F
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_processes_status:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x10
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_current_process_status:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x11
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_yield:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x12
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
 
 sys_invalid_op_code:
 	UD2

@@ -26,15 +26,14 @@ int get_current_process_read_FD();
 int get_current_process_write_FD();
 
 // priority
-void set_priority(uint64_t pid, int new_priority);
+int set_priority(uint64_t pid, int new_priority);
 int current_process_is_foreground();
 
 // printers
-char* print_process_status();
+void print_processes_status();
 void print_current_process();
 
 // sync
-void wait(int pid);
 void yield();
 
 #endif

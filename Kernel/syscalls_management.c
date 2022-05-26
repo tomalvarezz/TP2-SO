@@ -2,7 +2,7 @@
 #include <naiveConsole.h>
 #include <exceptions.h>
 #include <libraryc.h>
-
+#include <scheduler.h>
 
 #define STDIN 0
 #define STDOUT 1
@@ -10,88 +10,107 @@
 #define REGISTERS 16
 
 static uint64_t registers[REGISTERS];
-static int canPrintRegisters=0;
+static int canPrintRegisters = 0;
 
 /*En base a el codigo de syscall, que se encuentra en rax, se llama a la funcion del handler correspondiente*/
-//Agregar más registros para poder realizar la syscall new_process
+// Agregar más registros para poder realizar la syscall new_process
 
-//uint64_t rax, uint64_t rdi,uint64_t rsi, uint64_t rdx, uint64_t rsp
+// uint64_t rax, uint64_t rdi,uint64_t rsi, uint64_t rdx, uint64_t rsp
 
-uint64_t syscall_handler(uint64_t rdi, uint64_t rsi,uint64_t rdx, uint64_t rcx, uint64_t r8, uint64_t rax){
-    switch (rax)
-    {
-    case 0:
-        return sys_read_handler(rdi, (char*)rsi, rdx);
+uint64_t syscall_handler(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8, uint64_t rax) {
+    switch (rax) {
+        case 0:
+            return sys_read_handler(rdi, (char*)rsi, rdx);
 
-    case 1:
-        return sys_write_handler(rdi, (const char*)rsi, rdx);
+        case 1:
+            return sys_write_handler(rdi, (const char*)rsi, rdx);
 
-    case 2:
-        return sys_time_handler(rdi);
-    
-    case 3: 
-        ncClear();
-        break;
-    
-    case 4:
-        return sys_get_registers_handler((uint64_t*)rdi);
-    
-    case 5:
-        sys_get_memory_handler((uint8_t*)rdi ,(uint64_t*)rsi);
-        break;    
+        case 2:
+            return sys_time_handler(rdi);
 
-    //6,7,8 memory_manager syscalls
-    case 6: 
-        return malloc((uint64_t)rdi);
+        case 3:
+            ncClear();
+            break;
 
-    case 7:
-        free((void*)rdi);
-        break;
+        case 4:
+            return sys_get_registers_handler((uint64_t*)rdi);
 
-    case 8:
-        memory_dump();
-        break;
-    
-    case 9:
-        return sys_sleep_handler(rdi);
+        case 5:
+            sys_get_memory_handler((uint8_t*)rdi, (uint64_t*)rsi);
+            break;
 
-    //10, scheduler syscalls
-    case 10:
-        break;
+        // 6,7,8 memory_manager syscalls
+        case 6:
+            return malloc((uint64_t)rdi);
 
-    case 11:
-        break;
-    
-    case 12:
-        break;
+        case 7:
+            free((void*)rdi);
+            break;
+
+        case 8:
+            memory_dump();
+            break;
+
+        case 9:
+            return sys_sleep_handler(rdi);
+  
+        //10, 18 scheduler syscalls
+        case 10:
+            return new_process((void (*)(int, char**))rdi, (int)rsi, (char**)rdx, (int)rcx, (int*)r8);
+
+        case 11:
+            return kill_process((uint64_t) rdi);
+
+        case 12:
+            return block_process((uint64_t) rdi);
+
+        case 13:
+            return ready_process((uint64_t) rdi);
+
+        case 14:
+            return get_process_PID();
         
-    default:
-        break;
+        case 15:
+            return set_priority((uint64_t) rdi, (int) rsi);
+
+        case 16: 
+            print_processes_status();
+            break;
+        
+        case 17:
+            print_current_process();
+            break;
+
+        case 18:
+            yield();
+            break;
+
+        default:
+            break;
     }
 
     return 0;
 }
 
-uint64_t sys_read_handler(uint64_t fd, char* buf, uint64_t count){
+uint64_t sys_read_handler(uint64_t fd, char* buf, uint64_t count) {
 
     _sti();
-    char *inBuffer;
+    char* inBuffer;
     int sizebuff;
 
-    //colocamos en *inBuffer lo que el ingresa el usuario hasta el '/n'
-    do
-    {
-        inBuffer=getBuffer();
-        //con esta instruccion logramos que no este pidiendo constantemente una tecla, sino que espera a la proxima interrupcion
+    // colocamos en *inBuffer lo que el ingresa el usuario hasta el '/n'
+    do {
+        inBuffer = getBuffer();
+        // con esta instruccion logramos que no este pidiendo constantemente una tecla, sino que espera a la proxima interrupcion
         _hlt();
-    } while ((sizebuff = sizeBuffer()) < count && inBuffer[sizebuff-1]!='\n');
+    } while ((sizebuff = sizeBuffer()) < count && inBuffer[sizebuff - 1] != '\n');
 
     _cli();
 
-    //colocamos en buf lo que el usuario volco en el buffer siempre y cuando el file descriptor sea entrada estandar 
+    // colocamos en buf lo que el usuario volco en el buffer siempre y cuando el file descriptor sea entrada estandar
     int i;
-    if(fd == STDIN){
-        for(i = 0; i < count && i < sizebuff ; i++){
+    if (fd == STDIN) {
+        for (i = 0; i < count && i < sizebuff; i++) {
             buf[i] = inBuffer[i];
         }
     }
@@ -102,56 +121,56 @@ uint64_t sys_read_handler(uint64_t fd, char* buf, uint64_t count){
 }
 
 uint64_t sys_write_handler(uint64_t fd, const char* buf, uint64_t count) {
-    //en caso de que el file descriptior sea salida estandar imprimimos en pantalla lo que se encuentre en buf
-    if(fd == STDOUT) {
-        for(int i = 0 ; i < count ; i++)
+    // en caso de que el file descriptior sea salida estandar imprimimos en pantalla lo que se encuentre en buf
+    if (fd == STDOUT) {
+        for (int i = 0; i < count; i++)
             ncPrintChar(buf[i]);
 
-    //en caso de que el file descriptor sea USER(define hecho en el codigo) imprimimos en pantalla lo que se encuentre en buff de color verde y fondo negro
-    } else if(fd == USER) {
-        for(int i = 0 ; i < count ; i++)
+        // en caso de que el file descriptor sea USER(define hecho en el codigo) imprimimos en pantalla lo que se encuentre en buff de color verde y fondo negro
+    } else if (fd == USER) {
+        for (int i = 0; i < count; i++)
             ncPrintCharColor(buf[i], 0x02);
     }
-	
-	return count;
+
+    return count;
 }
 
 /*Llama a la funcion de asm RTC que recibe un codigo segun que unidad de tiempo se desee y devuelve el mismo
 Para mas informacion visitar el sitio https://stanislavs.org/helppc/cmos_ram.html*/
-uint64_t sys_time_handler(uint64_t time){
+uint64_t sys_time_handler(uint64_t time) {
     return RTC(time);
 }
 
 /*Recibe un vector con los 19 registros y los deposita en el vector dest*/
-int sys_get_registers_handler(uint64_t* dest){
-    if(canPrintRegisters){
-        for(int i = 0 ; i < REGISTERS ; i++){
-        dest[i]=registers[i];
+int sys_get_registers_handler(uint64_t* dest) {
+    if (canPrintRegisters) {
+        for (int i = 0; i < REGISTERS; i++) {
+            dest[i] = registers[i];
         }
     }
-    return canPrintRegisters;    
+    return canPrintRegisters;
 }
 
 /*Funcion que guarda los registros guardados */
-void write_registers(uint64_t* src){
-    canPrintRegisters=1;
-    for(int i = 0 ; i < REGISTERS ; i++){
-        registers[i]=src[i];
+void write_registers(uint64_t* src) {
+    canPrintRegisters = 1;
+    for (int i = 0; i < REGISTERS; i++) {
+        registers[i] = src[i];
     }
 }
 
 /*Recibe un puntero que es la direccion de comienzo desde la cual se volcara la cantidad de memoria correspondiente en dump */
-void sys_get_memory_handler(uint8_t* start ,uint64_t* dump){
-    for(int i = 0 ; i < 32 ; i++){
-        dump[i]=start[i];
+void sys_get_memory_handler(uint8_t* start, uint64_t* dump) {
+    for (int i = 0; i < 32; i++) {
+        dump[i] = start[i];
     }
 }
 
 /*duerme el sistema durante n mili segundos*/
 uint64_t sys_sleep_handler(uint64_t timeout_ms) {
-  uint64_t start_ms = millis();
-  do {
-    _hlt();
-  } while (millis() - start_ms < timeout_ms);
-  return 1;
+    uint64_t start_ms = millis();
+    do {
+        _hlt();
+    } while (millis() - start_ms < timeout_ms);
+    return 1;
 }
