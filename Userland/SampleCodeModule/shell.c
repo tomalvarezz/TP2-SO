@@ -42,7 +42,7 @@ void shell(){
         buffer[buff_size-1]=0;
 
         argc = getBuffer(buffer,argv);
-
+        
         exit = runCommand(argc, argv);
     }
 }

@@ -43,9 +43,9 @@ static void printTime();
 static void printRegisters();
 static void printMemory();
 static void zeroExceptionCommand();
-static void invalidOpCodeExceptionCommand();
 static void bringTime(char *finalStr);
 static int checkArgc(int argc, int validNum);
+static void loop();
 
 /*devuelve el numero de comando que se encuentra en el vector de strings 'coms' en caso de que el comando sea correcto, caso contrario retornara COM_NUM*/
 static int checkCommand(char *com)
@@ -124,12 +124,33 @@ int runCommand(int argc, char* argv[]) {
     case 10:
         checkArgc(argc, 1);
         printf("LOOP\n");
+        char* argv[]={"Soy el loop\n"};
+        if(sys_new_process(&loop, 1, argv, 0, 0) < 0){
+            printf("Error al crear el loop");
+        }
         break;
     
     case 11: 
         checkArgc(argc, 2);
         //Convertir argv[1] a numero, y pasarle eso
-        sys_kill_process(argv[1]);
+
+        printf("\n%s\n", argv[1]);
+
+        int pid=satoi(argv[1]);
+
+        printf("\nPID: %d\n", pid);
+
+        if(pid < 0){
+            printf("Argumento invalido\n");
+            return 1;
+        }
+
+        if(sys_kill_process(pid)>0){
+            printf("Proceso PID: %d eliminado\n", pid);
+        }
+        else{
+            printf("No se pudo eliminar proceso PID: %d\n", pid);
+        }
         break;
     
     case 12:
@@ -207,7 +228,7 @@ int runCommand(int argc, char* argv[]) {
 }
 
 static int checkArgc(int argc, int validNum){
-    if(argc!=validNum){
+    if(argc==validNum){
         return 0;
     }
     printf("\nCantidad de parametros invalido\n");
@@ -290,12 +311,6 @@ static void zeroExceptionCommand()
     int x = 5 / 0;
 }
 
-/*Fuerza un un llamado a la syscall por codigo invalido*/
-static void invalidOpCodeExceptionCommand()
-{
-   
-}
-
 /*Devuelve la fecha actual del sistema en finalStr a travez de la irq 'Timer Tick'*/
 static void bringTime(char *finalStr)
 {
@@ -341,4 +356,12 @@ static void bringTime(char *finalStr)
         strCat(finalStr, "0");
     }
     strCat(finalStr, secStr);
+}
+
+static void loop(){
+    int pid=sys_get_process_pid();
+    while(1){
+        printf("HOLA! Soy %d\n", pid);
+        sys_sleep(5000);
+    }
 }

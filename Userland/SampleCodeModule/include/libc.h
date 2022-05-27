@@ -20,6 +20,8 @@ uint64_t hexaStrToint(char *hexaStr);
 int pow(int x, unsigned int y);
 void *malloc(uint64_t malloc_bytes);
 void free(void *block);
+int satoi(char *str);
+int check_digit(char c);
 
 #endif
 
