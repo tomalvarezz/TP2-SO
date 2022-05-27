@@ -43,7 +43,7 @@ void shell(){
 
         argc = getBuffer(buffer,argv);
 
-        exit = runCommand(checkCommand(argv[0]));
+        exit = runCommand(argc, argv);
     }
 }
 

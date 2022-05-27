@@ -1,7 +1,5 @@
 #ifndef _COMMANDS_H_
 #define _COMMANDS_H_
 
-int runCommand(int com);
-int checkCommand(char* com);
-
+int  runCommand(int argc, char* argv[]);
 #endif

@@ -37,6 +37,7 @@ static char coms_desc[COM_NUM][80] =
      "Test procesos con semaforos",
      "Test procesos sin semaforos"};
 
+static int checkCommand(char *com);
 static void printHelp();
 static void printTime();
 static void printRegisters();
@@ -44,12 +45,11 @@ static void printMemory();
 static void zeroExceptionCommand();
 static void invalidOpCodeExceptionCommand();
 static void bringTime(char *finalStr);
+static int checkArgc(int argc, int validNum);
 
 /*devuelve el numero de comando que se encuentra en el vector de strings 'coms' en caso de que el comando sea correcto, caso contrario retornara COM_NUM*/
-int checkCommand(char *com)
+static int checkCommand(char *com)
 {
-
-
     int i;
     for (i = 0; i < COM_NUM; i++)
     {
@@ -59,90 +59,112 @@ int checkCommand(char *com)
         }
     }
 
-    
     return i;
 }
 
 /*En base a un numero de comando pasado por parametro se ejecuta la funcion correspondiente, retorna la funcion en caso de que el comando sea exit=1*/
-int runCommand(int com) {
+int runCommand(int argc, char* argv[]) {
     int exit = 0;
+
+    int com=checkCommand(argv[0]);
 
     switch (com)
     {
     case 0:
+        checkArgc(argc, 1);
         printHelp();
         break;
 
     case 1:
+        checkArgc(argc, 1);
         exit = 1;
         printf("Salgo de userland\n");
         break;
 
     case 2:
+        checkArgc(argc, 1);
         sys_clear();
         break;
 
     case 3:
+        checkArgc(argc, 1);
         printTime();
         break;
 
     case 4:
+        checkArgc(argc, 1);
         printRegisters();
         break;
 
     case 5:
+        checkArgc(argc, 1);
         printMemory();
         break;
 
     case 6:
+        checkArgc(argc, 1);
         zeroExceptionCommand();
         break;
 
     case 7:
+        checkArgc(argc, 1);
         sys_invalid_op_code();;
         break;
 
     case 8:
+        checkArgc(argc, 1);
         sys_processes_status();
         break;
 
     case 9:
+        checkArgc(argc, 1);
         sys_memory_dump();
         break;
     
     case 10:
+        checkArgc(argc, 1);
         printf("LOOP\n");
         break;
     
     case 11: 
-        printf("KILL\n");
+        checkArgc(argc, 2);
+        //Convertir argv[1] a numero, y pasarle eso
+        sys_kill_process(argv[1]);
         break;
     
     case 12:
+        checkArgc(argc, 3);
         printf("NICE\n");
         break;
     
     case 13:
+        checkArgc(argc, 2);
         printf("BLOCK\n");
         break;
     
     case 14:
+        checkArgc(argc, 1);
         sys_sem_status();
         break;
     
     case 15:
+        checkArgc(argc, 2);
         printf("CAT\n");
         break;
     
     case 16:
+        checkArgc(argc, 2);
         printf("WC\n");
         break;
 
     case 17:
+        //chequear cantidad de argumentos
+        checkArgc(argc, 2);
         printf("FILTER\n");
         break;
     
     case 18:
+        checkArgc(argc, 1);
         sys_pipe_status();
         break;
     
@@ -151,22 +173,27 @@ int runCommand(int com) {
         break;
     
     case 20:
+        checkArgc(argc, 1);
         printf("test_mm\n");
         break;
     
     case 21:
+        checkArgc(argc, 1);
         printf("test_processes\n");
         break;
     
     case 22:
+        checkArgc(argc, 1);
         printf("test_priority\n");
         break;
     
     case 23:
+        checkArgc(argc, 1);
         printf("test_synchro\n");
         break;
     
     case 24:
+        checkArgc(argc, 1);
         printf("test_no_synchro\n");
         break;
         
@@ -177,6 +204,14 @@ int runCommand(int com) {
     }
 
     return exit;
+}
+
+static int checkArgc(int argc, int validNum){
+    if(argc!=validNum){
+        return 0;
+    }
+    printf("\nCantidad de parametros invalido\n");
+    return -1;
 }
 
 /*Imprime en pantalla el vector de strings de 'help'*/
