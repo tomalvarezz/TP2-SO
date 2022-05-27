@@ -180,9 +180,9 @@ void memory_dump() {
 
     while (current != first || flag) {
         flag = FALSE;
-        printf("    Bloque numero: %d\n", block_number);
-        printf("    Base:%x\n", (uint64_t)current);
-        printf("    Bytes disponibles: %d\n\n", (int)current->data.size);
+        printf("\tBloque numero: %d\n", block_number);
+        printf("\tBase:%x\n", (uint64_t)current);
+        printf("\tBytes disponibles: %d\n\n", (int)current->data.size);
 
         current = current->data.ptr;
         block_number++;

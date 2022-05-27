@@ -17,8 +17,7 @@ extern uint64_t sys_memory_dump(void);
 extern uint64_t sys_sleep(uint64_t tenth_of_seconds);
 
 //Syscalls scheduling
-extern uint64_t sys_new_process(void (*entryPoint)(int, char**), int argc, char** argv,
-                                int foreground, int* fd);
+extern uint64_t sys_new_process(void (*entryPoint)(int, char**), int argc, char** argv, int foreground, int* fd);
 extern uint64_t sys_kill_process(uint64_t pid);
 extern uint64_t sys_block_process(uint64_t pid);
 extern uint64_t sys_ready_process(uint64_t pid);

@@ -21,7 +21,7 @@ void shell(){
     strCpy(user,buffer);
     userLen=strLen(user);
 
-    printf("\nBienvenido!\nComando \'help\' para mas ayuda\n\n");
+    printf("\nBienvenido!\nComando \'/help\' para mas ayuda\n\n");
     printf("Presione 'CTRL' en cualquier momento para guardar el valor de los registros\n");
     printf("Que modulo desea correr?\n");
     getBuffer();

@@ -10,7 +10,7 @@
 void initialize_scheduler();
 int new_process(void (*entryPoint)(int, char**), int argc, char** argv,
                 int foreground, int* fd);
-void callTimerTick();
+extern void callTimerTick();
 void* scheduler(void* sp);
 
 // estado de proceso
