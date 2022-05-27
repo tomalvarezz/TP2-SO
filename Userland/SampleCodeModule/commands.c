@@ -71,78 +71,95 @@ int runCommand(int argc, char* argv[]) {
     switch (com)
     {
     case 0:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         printHelp();
         break;
 
     case 1:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         exit = 1;
         printf("Salgo de userland\n");
         break;
 
     case 2:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         sys_clear();
         break;
 
     case 3:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         printTime();
         break;
 
     case 4:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         printRegisters();
         break;
 
     case 5:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         printMemory();
         break;
 
     case 6:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         zeroExceptionCommand();
         break;
 
     case 7:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         sys_invalid_op_code();;
         break;
 
     case 8:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         sys_processes_status();
         break;
 
     case 9:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         sys_memory_dump();
         break;
     
     case 10:
-        checkArgc(argc, 1);
-        printf("LOOP\n");
-        char* argv[]={"Soy el loop\n"};
-        if(sys_new_process(&loop, 1, argv, 0, 0) < 0){
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
+        char* argv_loop[]={"Proceso loop"};
+        if(sys_new_process(&loop, 1, argv_loop, 0, 0) < 0){
             printf("Error al crear el loop");
         }
         break;
     
     case 11: 
-        checkArgc(argc, 2);
-        //Convertir argv[1] a numero, y pasarle eso
-
-        printf("\n%s\n", argv[1]);
-
+        if(checkArgc(argc, 2)<0){
+            break;
+        }
         int pid=satoi(argv[1]);
-
-        printf("\nPID: %d\n", pid);
 
         if(pid < 0){
             printf("Argumento invalido\n");
-            return 1;
+            break;
         }
 
         if(sys_kill_process(pid)>0){
@@ -154,67 +171,94 @@ int runCommand(int argc, char* argv[]) {
         break;
     
     case 12:
-        checkArgc(argc, 3);
+        if(checkArgc(argc, 3)<0){
+            break;
+        }
         printf("NICE\n");
         break;
     
     case 13:
-        checkArgc(argc, 2);
+        if(checkArgc(argc, 2)<0){
+            break;
+        }
         printf("BLOCK\n");
         break;
     
     case 14:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         sys_sem_status();
         break;
     
     case 15:
-        checkArgc(argc, 2);
+        if(checkArgc(argc, 2)<0){
+            break;
+        }
         printf("CAT\n");
         break;
     
     case 16:
-        checkArgc(argc, 2);
+        if(checkArgc(argc, 2)<0){
+            break;
+        }
         printf("WC\n");
         break;
 
     case 17:
         //chequear cantidad de argumentos
-        checkArgc(argc, 2);
+        if(checkArgc(argc, 2)<0){
+            break;
+        }
         printf("FILTER\n");
         break;
     
     case 18:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         sys_pipe_status();
         break;
     
     case 19:
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         printf("PHYLO\n");
         break;
     
     case 20:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         printf("test_mm\n");
         break;
     
     case 21:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         printf("test_processes\n");
         break;
     
     case 22:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         printf("test_priority\n");
         break;
     
     case 23:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         printf("test_synchro\n");
         break;
     
     case 24:
-        checkArgc(argc, 1);
+        if(checkArgc(argc, 1)<0){
+            break;
+        }
         printf("test_no_synchro\n");
         break;
         
@@ -232,6 +276,7 @@ static int checkArgc(int argc, int validNum){
         return 0;
     }
     printf("\nCantidad de parametros invalido\n");
+    printf("\nCantidad de parametros esperado es: %d\n", validNum);
     return -1;
 }
 
@@ -284,7 +329,7 @@ static void printMemory()
     {
         if (flag == 1)
         {
-            printf("\nFormato incorrecto, intentelo de nuevo: ");
+            printf("\nFormato incorrecto, intentelo de nuevo:");
         }
         sys_read(STDIN, hexaNum, 18);
         flag = 1;
@@ -361,7 +406,7 @@ static void bringTime(char *finalStr)
 static void loop(){
     int pid=sys_get_process_pid();
     while(1){
-        printf("HOLA! Soy %d\n", pid);
-        sys_sleep(5000);
+        printf("\nHOLA! Soy loop %d\n", pid);
+        sys_sleep(10000);
     }
 }
