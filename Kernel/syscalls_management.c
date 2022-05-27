@@ -3,6 +3,8 @@
 #include <exceptions.h>
 #include <libraryc.h>
 #include <scheduler.h>
+#include <semaphores.h>
+#include <pipes.h>
 
 #define STDIN 0
 #define STDOUT 1
@@ -83,6 +85,40 @@ uint64_t syscall_handler(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,
 
         case 18:
             yield();
+            break;
+
+        //19,23 semaphore syscalls
+        case 19:
+            return sem_open((uint32_t)rdi, (uint64_t) rsi);
+
+        case 20:
+            return sem_wait((uint32_t)rdi);
+        
+        case 21:
+            return sem_post((uint32_t) rdi);
+        
+        case 22:
+            return sem_close((uint32_t) rdi);
+        
+        case 23:
+            sem_status();
+            break;
+
+        //24, pipes syscalls
+        case 24:
+            return pipe_open((uint64_t) rdi);
+        
+        case 25:
+            return pipe_write((uint64_t) rdi, (char*)rsi);
+        
+        case 26:
+            return pipe_read((uint64_t) rdi);
+
+        case 27:
+            return pipe_close((uint64_t) rdi);
+
+        case 28:
+            pipe_status((uint64_t) rdi);
             break;
 
         default:

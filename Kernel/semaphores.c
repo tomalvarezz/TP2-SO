@@ -22,7 +22,6 @@ typedef struct t_semaphore_list {
     t_semaphore* last;
 } t_semaphore_list;
 
-
 t_semaphore* semaphores;
 
 static t_semaphore* get_semaphore(uint32_t id);
@@ -30,6 +29,7 @@ static t_semaphore* new_semaphore(uint32_t id, uint64_t initialValue);
 static void add_to_list(t_semaphore* newSem);
 static void unblock_process(t_semaphore* sem);
 static void remove_from_list(t_semaphore* sem);
+static void blocked_processes_dump(int* blocked_processes, uint16_t blocked_processes_count);
 
 int sem_open(uint32_t id, uint64_t initial_value) {
     t_semaphore* semaphore = get_semaphore(id);
@@ -106,6 +106,27 @@ int sem_close(uint32_t id) {
     }
 
     return OK;
+}
+
+void sem_status() {
+    printf("\nEstado de los semaforos activos\n\n");
+    t_semaphore* sem = semaphores;
+    while (sem) {
+        printf("ID: %d\n", sem->id);
+        printf("\tValor: %d\n", sem->value);
+        printf("\tCantidad de procesos ligados al semaforo: %d\n", sem->listening_processes);
+        printf("\tCantidad de procesos bloqueados: %d\n", sem->blocked_processes_count);
+        printf("\tProcesos blockeados:\n");
+        blocked_processes_dump(sem->blocked_processes, sem->blocked_processes_count);
+        sem = sem->next;
+    }
+}
+
+static void blocked_processes_dump(int* blocked_processes, uint16_t blocked_processes_count) {
+    for (int i = 0; i < blocked_processes_count; i++) {
+        printf("\tPID: %d\n", blocked_processes[i]);
+    }
+    printf("\n");
 }
 
 static t_semaphore* new_semaphore(uint32_t id, uint64_t initial_value) {

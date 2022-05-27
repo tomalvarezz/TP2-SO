@@ -8,7 +8,7 @@
 #define STDIN 0
 #define REGISTERS 16
 
-static char coms[COM_NUM][25]={"help","exit","clear","time","inforeg","printmem","split","zero_division","invalid_op_code"};
+static char coms[COM_NUM][25]={"/help","/exit","/clear","/time","/inforeg","/printmem","/split","/zero_division","/invalid_op_code"};
 static char coms_desc[COM_NUM][80]=
 { "Muestro ayuda", 
 "Cierro la terminal", 

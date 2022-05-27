@@ -5,10 +5,10 @@
 #include <stdint.h>
 
 
-int pipe_open(int id);
-int pipe_write(int id, char *str);
-int pipe_read(int id);
-int pipe_close(int id);
+uint64_t pipe_open(uint64_t id);
+uint64_t pipe_write(uint64_t id, char *str);
+uint64_t pipe_read(uint64_t id);
+uint64_t pipe_close(uint64_t id);
 
 //Función para mostrar estado de todos los pipes
 void pipe_status();

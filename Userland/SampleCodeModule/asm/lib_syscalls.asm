@@ -19,6 +19,17 @@ GLOBAL sys_set_priority
 GLOBAL sys_processes_status
 GLOBAL sys_current_process_status
 GLOBAL sys_yield
+GLOBAL sys_sem_open
+GLOBAL sys_sem_wait
+GLOBAL sys_sem_post
+GLOBAL sys_sem_close
+GLOBAL sys_sem_status
+GLOBAL sys_pipe_open
+GLOBAL sys_pipe_write
+GLOBAL sys_pipe_read
+GLOBAL sys_pipe_close
+GLOBAL sys_pipe_status
+
 
 GLOBAL sys_invalid_op_code
 
@@ -232,6 +243,115 @@ sys_yield:
 	pop rbp
 	ret
 
+sys_sem_open:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x13
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_sem_wait:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x14
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_sem_post:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x15
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_sem_close:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x16
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_sem_status:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x17
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_pipe_open:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x18
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_pipe_write:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x19
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_pipe_read:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x1A
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_pipe_close:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x1B
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_pipe_status:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x1C
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
 sys_invalid_op_code:
 	UD2
 	ret

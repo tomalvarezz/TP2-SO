@@ -1,5 +1,6 @@
 #include <pipes.h>
 #include <semaphores.h>
+#include <libraryc.h>
 
 #define BUFFER_SIZE 1204
 #define MAX_PIPES 8
@@ -7,27 +8,26 @@
 #define IN_USE 1
 #define EMPTY 0
 
-
 static int initial_sem = 1000;
 
 typedef struct t_pipe {
-    int id;
+    uint64_t id;
     char buffer[BUFFER_SIZE];
-    int step_to_write, step_to_read;
+    uint64_t step_to_write, step_to_read;
     long total_processes;
-    int write_sem, read_sem;
-    int state;
+    uint64_t write_sem, read_sem;
+    uint64_t state;
 } t_pipe;
 
 static t_pipe pipes[MAX_PIPES];
 
-static int create_pipe(int id);
-static int get_new_index();
-static int get_index(int id);
-static int pipe_writer(char c, int idx);
+static uint64_t create_pipe(uint64_t id);
+static uint64_t get_new_index();
+static uint64_t get_index(uint64_t id);
+static uint64_t pipe_writer(char c, uint64_t idx);
 
-int pipe_open(int id) {
-    int idx;
+uint64_t pipe_open(uint64_t id) {
+    uint64_t idx;
     if ((idx = get_index(id)) == -1) {
         idx = create_pipe(id);
         if (idx == -1) {
@@ -38,12 +38,12 @@ int pipe_open(int id) {
     return id;
 }
 
-int pipe_write(int id, char* str) {
-    int idx = get_index(id);
+uint64_t pipe_write(uint64_t id, char* str) {
+    uint64_t idx = get_index(id);
     if (idx == -1) {
         return -1;
     }
-    int i = 0;
+    uint64_t i = 0;
 
     while (str[i] != 0) {
         pipe_writer(str[i], idx);
@@ -53,8 +53,8 @@ int pipe_write(int id, char* str) {
     return id;
 }
 
-int pipe_read(int id) {
-    int idx = get_index(id);
+uint64_t pipe_read(uint64_t id) {
+    uint64_t idx = get_index(id);
     if (idx == -1) {
         return -1;
     }
@@ -71,28 +71,46 @@ int pipe_read(int id) {
     return c;
 }
 
-int pipe_close(int id){
-    int idx = get_index(id);
-  if (idx == -1) {
-    return -1;
-  }
+uint64_t pipe_close(uint64_t id) {
+    uint64_t idx = get_index(id);
+    if (idx == -1) {
+        return -1;
+    }
 
-  t_pipe *pipe = &(pipes[idx]);
+    t_pipe* pipe = &(pipes[idx]);
 
-  pipe->total_processes--;
-  if (pipe->total_processes > 0) {
+    pipe->total_processes--;
+    if (pipe->total_processes > 0) {
+        return 1;
+    }
+
+    sem_close(pipe->read_sem);
+    sem_close(pipe->write_sem);
+
+    pipe->state = EMPTY;
+
     return 1;
-  }
-
-  sem_close(pipe->read_sem);
-  sem_close(pipe->write_sem);
-
-  pipe->state = EMPTY;
-
-  return 1;
 }
 
-static int get_index(int id) {
+void pipe_status() {
+    printf("\n\nEstado de pipes activos\n\n");
+    for (int i = 0; i < MAX_PIPES; i++) {
+        t_pipe pipe = pipes[i];
+        if (pipe.state == IN_USE) {
+            printf("\tID: %d\n", pipe.id);
+            printf("\tNro de procesos asociados: %d\n", pipe.total_processes);
+            printf("\tSemaforo de read: %d\n", pipe.read_sem);
+            printf("\tSemaforo de write: %d\n", pipe.write_sem);
+            printf("\tPipe buffer content: ");
+            for (int i = pipe.step_to_read; i != pipe.step_to_write; i = (i + 1) % BUFFER_SIZE) {
+                putChar(pipe.buffer[i]);
+            }
+        }
+    }
+    printf("\n\n");
+}
+
+static uint64_t get_index(uint64_t id) {
     for (int i = 0; i < MAX_PIPES; i++) {
         if (pipes[i].state == IN_USE && pipes[i].id == id) {
             return i;
@@ -101,7 +119,7 @@ static int get_index(int id) {
     return -1;
 }
 
-static int get_new_index() {
+static uint64_t get_new_index() {
     for (int i = 0; i < MAX_PIPES; i++) {
         if (pipes[i].state == EMPTY) {
             return i;
@@ -110,8 +128,8 @@ static int get_new_index() {
     return -1;
 }
 
-static int create_pipe(int id) {
-    int idx;
+static uint64_t create_pipe(uint64_t id) {
+    uint64_t idx;
     if ((idx = get_new_index()) == -1) {
         return -1;
     }
@@ -132,7 +150,7 @@ static int create_pipe(int id) {
     return id;
 }
 
-static int pipe_writer(char c, int idx) {
+static uint64_t pipe_writer(char c, uint64_t idx) {
     t_pipe* pipe = &(pipes[idx]);
 
     sem_wait(pipe->write_sem);

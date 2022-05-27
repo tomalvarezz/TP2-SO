@@ -7,8 +7,6 @@
 #include <memory_manager.h>
 #include <scheduler.h>
 #include <libraryc.h>
-#include <test_processes.h>
-#include <test_priority.h>
 
 #define STDIN 0
 #define STDOUT 1

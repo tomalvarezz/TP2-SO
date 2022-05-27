@@ -6,8 +6,6 @@
 
 #define MAX_BLOCKED_PROCESSES 20
 
-
-
 int sem_open(uint32_t id, uint64_t initial_value);
 int sem_wait(uint32_t id);
 int sem_post(uint32_t id);
