@@ -3,6 +3,13 @@
 
 #include <stdint.h>
 
+#define FOREGROUND 1
+#define BACKGROUND 0
+
+#define READY 0
+#define BLOCKED 1
+#define FINISHED 2
+
 extern uint64_t sys_read(uint64_t fd, char* buff, uint64_t count);
 extern uint64_t sys_write(uint64_t fd, const char* buff, uint64_t count);
 extern uint64_t sys_time(uint64_t time);
@@ -25,6 +32,7 @@ extern uint64_t sys_get_process_pid();
 extern uint64_t sys_set_priority(uint64_t pid, int new_priority);
 extern uint64_t sys_processes_status();
 extern uint64_t sys_current_process_status();
+extern uint64_t sys_get_process_state(uint64_t pid);
 extern uint64_t sys_yield();
 
 //Syscalls semaphores

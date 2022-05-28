@@ -432,6 +432,15 @@ static void print_process(t_process_node* node) {
     printf("State: %s\n\n", status_to_print(node->pcb.state));
 }
 
+int get_process_state(uint64_t pid){
+    t_process_node* process = get_process(pid);
+
+    if(process==NULL){
+        return -1;
+    }
+    return process->pcb.state;
+}
+
 void yield() {
     cycles_left = 0;
     callTimerTick();

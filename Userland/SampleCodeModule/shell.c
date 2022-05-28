@@ -33,6 +33,7 @@ void shell(){
     //getBuffer();
     //exit = runCommand(checkCommand(buffer));
 
+
     while (!exit){
         putChar('$');
         sys_write(USER,user,userLen);
@@ -43,7 +44,7 @@ void shell(){
 
         argc = getBuffer(buffer,argv);
         
-        exit = runCommand(argc, argv);
+        exit=runCommand(argc, argv);
     }
 }
 

@@ -18,6 +18,7 @@ GLOBAL sys_get_process_pid
 GLOBAL sys_set_priority
 GLOBAL sys_processes_status
 GLOBAL sys_current_process_status
+GLOBAL sys_get_process_state
 GLOBAL sys_yield
 GLOBAL sys_sem_open
 GLOBAL sys_sem_wait
@@ -232,7 +233,7 @@ sys_current_process_status:
 	pop rbp
 	ret
 
-sys_yield:
+sys_get_process_state:
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -243,7 +244,7 @@ sys_yield:
 	pop rbp
 	ret
 
-sys_sem_open:
+sys_yield:
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -254,7 +255,7 @@ sys_sem_open:
 	pop rbp
 	ret
 
-sys_sem_wait:
+sys_sem_open:
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -265,7 +266,7 @@ sys_sem_wait:
 	pop rbp
 	ret
 
-sys_sem_post:
+sys_sem_wait:
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -276,7 +277,7 @@ sys_sem_post:
 	pop rbp
 	ret
 
-sys_sem_close:
+sys_sem_post:
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -287,7 +288,7 @@ sys_sem_close:
 	pop rbp
 	ret
 
-sys_sem_status:
+sys_sem_close:
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -298,7 +299,7 @@ sys_sem_status:
 	pop rbp
 	ret
 
-sys_pipe_open:
+sys_sem_status:
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -309,7 +310,7 @@ sys_pipe_open:
 	pop rbp
 	ret
 
-sys_pipe_write:
+sys_pipe_open:
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -320,7 +321,7 @@ sys_pipe_write:
 	pop rbp
 	ret
 
-sys_pipe_read:
+sys_pipe_write:
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -331,7 +332,7 @@ sys_pipe_read:
 	pop rbp
 	ret
 
-sys_pipe_close:
+sys_pipe_read:
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -342,11 +343,22 @@ sys_pipe_close:
 	pop rbp
 	ret
 
-sys_pipe_status:
+sys_pipe_close:
 	push rbp
 	mov rbp, rsp
 	push rbx
 	mov rax, 0x1C
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_pipe_status:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x1D
 	int 80h
 	pop rbx
 	mov rsp, rbp

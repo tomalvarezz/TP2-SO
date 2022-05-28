@@ -2,14 +2,15 @@
 #include <syscalls.h>
 #include <stdint.h>
 #include <commands.h>
+#include <tests.h>
 
 #define COM_NUM 25
 #define STDIN 0
 #define REGISTERS 16
 
-static char coms[COM_NUM][25] = {"/help", "/exit", "/clear", "/time", "/inforeg", 
-"/printmem", "/zero_division", "/invalid_op_code", "/ps", "/mem", "/loop","/kill","/nice","/block",
-"/sem", "/cat", "/wc", "/filter", "/pipe", "/phylo", "/test_mm", "/test_processes", "/test_priority", "/test_synchro", "/test_no_synchro"};
+static char coms[COM_NUM][25] = {"/help", "/exit", "/clear", "/time", "/inforeg",
+                                 "/printmem", "/zero_division", "/invalid_op_code", "/ps", "/mem", "/loop", "/kill", "/nice", "/block",
+                                 "/sem", "/cat", "/wc", "/filter", "/pipe", "/phylo", "/test_mm", "/test_processes", "/test_priority", "/test_synchro", "/test_no_synchro"};
 static char coms_desc[COM_NUM][80] =
     {"Muestro ayuda",
      "Cierro la terminal",
@@ -37,24 +38,21 @@ static char coms_desc[COM_NUM][80] =
      "Test procesos con semaforos",
      "Test procesos sin semaforos"};
 
-static int checkCommand(char *com);
+static int checkCommand(char* com);
 static void printHelp();
 static void printTime();
 static void printRegisters();
 static void printMemory();
 static void zeroExceptionCommand();
-static void bringTime(char *finalStr);
+static void bringTime(char* finalStr);
 static int checkArgc(int argc, int validNum);
 static void loop();
 
 /*devuelve el numero de comando que se encuentra en el vector de strings 'coms' en caso de que el comando sea correcto, caso contrario retornara COM_NUM*/
-static int checkCommand(char *com)
-{
+static int checkCommand(char* com) {
     int i;
-    for (i = 0; i < COM_NUM; i++)
-    {
-        if (strCmp(com, coms[i]) == 0)
-        {
+    for (i = 0; i < COM_NUM; i++) {
+        if (strCmp(com, coms[i]) == 0) {
             return i;
         }
     }
@@ -66,213 +64,255 @@ static int checkCommand(char *com)
 int runCommand(int argc, char* argv[]) {
     int exit = 0;
 
-    int com=checkCommand(argv[0]);
+    int com = checkCommand(argv[0]);
 
-    switch (com)
-    {
-    case 0:
-        if(checkArgc(argc, 1)<0){
+    switch (com) {
+        case 0:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            printHelp();
             break;
-        }
-        printHelp();
-        break;
 
-    case 1:
-        if(checkArgc(argc, 1)<0){
+        case 1:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            exit = 1;
+            printf("Salgo de userland\n");
             break;
-        }
-        exit = 1;
-        printf("Salgo de userland\n");
-        break;
 
-    case 2:
-        if(checkArgc(argc, 1)<0){
+        case 2:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            sys_clear();
             break;
-        }
-        sys_clear();
-        break;
 
-    case 3:
-        if(checkArgc(argc, 1)<0){
+        case 3:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            printTime();
             break;
-        }
-        printTime();
-        break;
 
-    case 4:
-        if(checkArgc(argc, 1)<0){
+        case 4:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            printRegisters();
             break;
-        }
-        printRegisters();
-        break;
 
-    case 5:
-        if(checkArgc(argc, 1)<0){
+        case 5:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            printMemory();
             break;
-        }
-        printMemory();
-        break;
 
-    case 6:
-        if(checkArgc(argc, 1)<0){
+        case 6:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            zeroExceptionCommand();
             break;
-        }
-        zeroExceptionCommand();
-        break;
 
-    case 7:
-        if(checkArgc(argc, 1)<0){
+        case 7:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            sys_invalid_op_code();
+            ;
             break;
-        }
-        sys_invalid_op_code();;
-        break;
 
-    case 8:
-        if(checkArgc(argc, 1)<0){
+        case 8:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            sys_processes_status();
             break;
-        }
-        sys_processes_status();
-        break;
 
-    case 9:
-        if(checkArgc(argc, 1)<0){
+        case 9:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            sys_memory_dump();
             break;
-        }
-        sys_memory_dump();
-        break;
-    
-    case 10:
-        if(checkArgc(argc, 1)<0){
-            break;
-        }
-        char* argv_loop[]={"Proceso loop"};
-        if(sys_new_process(&loop, 1, argv_loop, 0, 0) < 0){
-            printf("Error al crear el loop");
-        }
-        break;
-    
-    case 11: 
-        if(checkArgc(argc, 2)<0){
-            break;
-        }
-        int pid=satoi(argv[1]);
 
-        if(pid < 0){
-            printf("Argumento invalido\n");
+        case 10:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            char* argv_loop[] = {"Proceso loop"};
+            if (sys_new_process(&loop, 1, argv_loop, BACKGROUND, 0) < 0) {
+                printf("Error al crear el loop");
+            }
             break;
-        }
 
-        if(sys_kill_process(pid)>0){
-            printf("Proceso PID: %d eliminado\n", pid);
-        }
-        else{
-            printf("No se pudo eliminar proceso PID: %d\n", pid);
-        }
-        break;
-    
-    case 12:
-        if(checkArgc(argc, 3)<0){
-            break;
-        }
-        printf("NICE\n");
-        break;
-    
-    case 13:
-        if(checkArgc(argc, 2)<0){
-            break;
-        }
-        printf("BLOCK\n");
-        break;
-    
-    case 14:
-        if(checkArgc(argc, 1)<0){
-            break;
-        }
-        sys_sem_status();
-        break;
-    
-    case 15:
-        if(checkArgc(argc, 2)<0){
-            break;
-        }
-        printf("CAT\n");
-        break;
-    
-    case 16:
-        if(checkArgc(argc, 2)<0){
-            break;
-        }
-        printf("WC\n");
-        break;
+        case 11:
+            if (checkArgc(argc, 2) < 0) {
+                break;
+            }
+            int pid_kill = satoi(argv[1]);
 
-    case 17:
-        //chequear cantidad de argumentos
-        if(checkArgc(argc, 2)<0){
-            break;
-        }
-        printf("FILTER\n");
-        break;
-    
-    case 18:
-        if(checkArgc(argc, 1)<0){
-            break;
-        }
-        sys_pipe_status();
-        break;
-    
-    case 19:
-        if(checkArgc(argc, 1)<0){
-            break;
-        }
-        printf("PHYLO\n");
-        break;
-    
-    case 20:
-        if(checkArgc(argc, 1)<0){
-            break;
-        }
-        printf("test_mm\n");
-        break;
-    
-    case 21:
-        if(checkArgc(argc, 1)<0){
-            break;
-        }
-        printf("test_processes\n");
-        break;
-    
-    case 22:
-        if(checkArgc(argc, 1)<0){
-            break;
-        }
-        printf("test_priority\n");
-        break;
-    
-    case 23:
-        if(checkArgc(argc, 1)<0){
-            break;
-        }
-        printf("test_synchro\n");
-        break;
-    
-    case 24:
-        if(checkArgc(argc, 1)<0){
-            break;
-        }
-        printf("test_no_synchro\n");
-        break;
-        
+            if (pid_kill < 0) {
+                printf("\nArgumento invalido\n");
+                break;
+            }
 
-    default:
-        printf("Comando invalido\n");
-        break;
+            if (sys_kill_process(pid_kill) > 0) {
+                printf("\nProceso PID: %d eliminado\n", pid_kill);
+            } else {
+                printf("\nNo se pudo eliminar proceso PID: %d\n", pid_kill);
+            }
+            break;
+
+        case 12:
+            if (checkArgc(argc, 3) < 0) {
+                break;
+            }
+            int pid_nice=satoi(argv[1]);
+            int prior=satoi(argv[2]);
+            if( pid_nice<0 || prior<0 ){
+                printf("\nArgumento invalido\n");
+                break;
+            }
+
+            if( sys_set_priority(pid_nice, prior) > 0){
+                printf("\nPrioridad de proceso PID: %d cambiada a %d\n", pid_nice, prior);
+            } else {
+                printf("\nNo se pudo cambiar prioridad de proceso PID: %d\n", pid_nice);
+            }
+
+            break;
+
+        case 13:
+            if (checkArgc(argc, 2) < 0) {
+                break;
+            }
+
+            int pid_block = satoi(argv[1]);
+
+            if (pid_block < 0) {
+                printf("\nArgumento invalido\n");
+                break;
+            }
+
+            int state=sys_get_process_state(pid_block);
+
+            if (state < 0){
+                printf("\nEl proceso no existe\n");
+                break;
+            }
+
+            if( state==READY ){
+                printf("\nSe bloqueo proceso PID: %d\n", pid_block);
+                sys_block_process(pid_block);
+            }
+            if (state==BLOCKED){
+                printf("\nSe desbloqueo proceso PID: %d\n", pid_block);
+                sys_ready_process(pid_block);
+            }
+
+            break;
+
+        case 14:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            sys_sem_status();
+            break;
+
+        case 15:
+            if (checkArgc(argc, 2) < 0) {
+                break;
+            }
+            printf("CAT\n");
+            break;
+
+        case 16:
+            if (checkArgc(argc, 2) < 0) {
+                break;
+            }
+            printf("WC\n");
+            break;
+
+        case 17:
+            // chequear cantidad de argumentos
+            if (checkArgc(argc, 2) < 0) {
+                break;
+            }
+            printf("FILTER\n");
+            break;
+
+        case 18:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            sys_pipe_status();
+            break;
+
+        case 19:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            printf("PHYLO\n");
+            break;
+
+        case 20:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            char* argv_test_mm[] = {"Test Memory Manager"};
+            int test_mm_PID;
+            if (test_mm_PID=sys_new_process(&test_mm, 1, argv_test_mm, BACKGROUND, 0) < 0) {
+                printf("Error al crear el test memory manager");
+            }
+            printf("\nTesteo con PID: %d\n", test_mm_PID);
+            break;
+
+        case 21:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            char* argv_test_processes[] = {"Test Processes"};
+            int test_pro_PID;
+            if (test_pro_PID=sys_new_process(&test_processes, 1, argv_test_processes, BACKGROUND, 0) < 0) {
+                printf("Error al crear el test processes");
+            }
+            printf("\nTesteo con PID: %d\n", test_pro_PID);
+            break;
+
+        case 22:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            printf("test_priority\n");
+            break;
+
+        case 23:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            printf("test_synchro\n");
+            break;
+
+        case 24:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            printf("test_no_synchro\n");
+            break;
+
+        default:
+            printf("Comando invalido\n");
+            break;
     }
-
     return exit;
 }
 
-static int checkArgc(int argc, int validNum){
-    if(argc==validNum){
+static int checkArgc(int argc, int validNum) {
+    if (argc == validNum) {
         return 0;
     }
     printf("\nCantidad de parametros invalido\n");
@@ -281,54 +321,43 @@ static int checkArgc(int argc, int validNum){
 }
 
 /*Imprime en pantalla el vector de strings de 'help'*/
-static void printHelp()
-{
-    for (int i = 0; i < COM_NUM; i++)
-    {
+static void printHelp() {
+    for (int i = 0; i < COM_NUM; i++) {
         printf("%s: %s\n", coms[i], coms_desc[i]);
     }
 }
 
 /*Imprime el tiempo en pantalla*/
-static void printTime()
-{
+static void printTime() {
     char finalStr[26] = {0};
     bringTime(finalStr);
     printf("%s\n", finalStr);
 }
 
 /*Imprime los 16 registros en pantalla, utilizando la funcion en asm sys_get_register*/
-static void printRegisters()
-{
+static void printRegisters() {
     uint64_t registers[REGISTERS];
-    if (sys_get_registers(registers))
-    {
-        char *strRegisters[] =
+    if (sys_get_registers(registers)) {
+        char* strRegisters[] =
             {"R15:   ", "R14:   ", "R13:   ", "R12:   ", "R11:   ", "R10:   ", "R9:    ", "R8:    ", "RSI:   ", "RDI:   ", "RBP:   ", "RDX:   ", "RCX:   ", "RBX:   ", "RAX:   ", "RSP:   "};
 
-        for (int i = 0; i < REGISTERS; i++)
-        {
+        for (int i = 0; i < REGISTERS; i++) {
             printf("%s%x\n", strRegisters[i], registers[i]);
         }
-    }
-    else
-    {
+    } else {
         printf("Presione la tecla \'CTRL\' para guardar los registros\n");
     }
 }
 
 /*Le pide al usuario un numero en hexadecimal, el cual se chequea si es valido, e imprime en pantalla 32 bytes de memoria a partir de dicha direccion*/
-static void printMemory()
-{
+static void printMemory() {
     int flag = 0;
     char hexaNum[20] = {0};
     uint64_t memoryDump[32]; // 32 pues el el numero de bytes que va a imprimir charde memoria
 
     printf("Escriba un numero en Hexadecimal: ");
-    do
-    {
-        if (flag == 1)
-        {
+    do {
+        if (flag == 1) {
             printf("\nFormato incorrecto, intentelo de nuevo:");
         }
         sys_read(STDIN, hexaNum, 18);
@@ -339,10 +368,8 @@ static void printMemory()
 
     sys_get_memory(num, memoryDump);
 
-    for (int i = 0; i < 32; i++)
-    {
-        if (i % 4 == 0)
-        {
+    for (int i = 0; i < 32; i++) {
+        if (i % 4 == 0) {
             printf("\n");
         }
         printf("%d: %x ", i + 1, memoryDump[i]);
@@ -351,14 +378,12 @@ static void printMemory()
 }
 
 /*Fuerza una excepcion de dividir por 0*/
-static void zeroExceptionCommand()
-{
+static void zeroExceptionCommand() {
     int x = 5 / 0;
 }
 
 /*Devuelve la fecha actual del sistema en finalStr a travez de la irq 'Timer Tick'*/
-static void bringTime(char *finalStr)
-{
+static void bringTime(char* finalStr) {
     finalStr[0] = '\0';
 
     uint64_t day = sys_time(0x07);
@@ -396,16 +421,15 @@ static void bringTime(char *finalStr)
     strCat(finalStr, minStr);
     strCat(finalStr, ":");
 
-    if (seconds < 10)
-    {
+    if (seconds < 10) {
         strCat(finalStr, "0");
     }
     strCat(finalStr, secStr);
 }
 
-static void loop(){
-    int pid=sys_get_process_pid();
-    while(1){
+static void loop() {
+    int pid = sys_get_process_pid();
+    while (1) {
         printf("\nHOLA! Soy loop %d\n", pid);
         sys_sleep(10000);
     }

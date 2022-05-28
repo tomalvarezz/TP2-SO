@@ -84,40 +84,43 @@ uint64_t syscall_handler(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,
             break;
 
         case 18:
+            return get_process_state((uint64_t) rdi);
+
+        case 19:
             yield();
             break;
 
-        //19,23 semaphore syscalls
-        case 19:
+        //20,24 semaphore syscalls
+        case 20:
             return sem_open((uint32_t)rdi, (uint64_t) rsi);
 
-        case 20:
+        case 21:
             return sem_wait((uint32_t)rdi);
         
-        case 21:
+        case 22:
             return sem_post((uint32_t) rdi);
         
-        case 22:
+        case 23:
             return sem_close((uint32_t) rdi);
         
-        case 23:
+        case 24:
             sem_status();
             break;
 
-        //24, pipes syscalls
-        case 24:
+        //25, 29pipes syscalls
+        case 25:
             return pipe_open((uint64_t) rdi);
         
-        case 25:
+        case 26:
             return pipe_write((uint64_t) rdi, (char*)rsi);
         
-        case 26:
+        case 27:
             return pipe_read((uint64_t) rdi);
 
-        case 27:
+        case 28:
             return pipe_close((uint64_t) rdi);
 
-        case 28:
+        case 29:
             pipe_status((uint64_t) rdi);
             break;
 

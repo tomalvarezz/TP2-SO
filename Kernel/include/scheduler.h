@@ -18,6 +18,7 @@ int set_state(uint64_t pid, int new_state);
 int kill_process(uint64_t pid);
 int block_process(uint64_t pid);
 int ready_process(uint64_t pid);
+int get_process_state(uint64_t pid);
 int kill_current_FG_process();
 
 // getters
