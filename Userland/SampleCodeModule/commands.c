@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <commands.h>
 #include <tests.h>
+#include <phylo.h>
 
 #define COM_NUM 25
 #define STDIN 0
@@ -260,7 +261,8 @@ int runCommand(int argc, char* argv[]) {
             if (checkArgc(argc, 1) < 0) {
                 break;
             }
-            printf("PHYLO\n");
+
+            phylosophersProblem();       
             break;
 
         case 20:

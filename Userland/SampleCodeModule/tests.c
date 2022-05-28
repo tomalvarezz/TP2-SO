@@ -70,7 +70,6 @@ void test_processes(){
   p_rq p_rqs[MAX_PROCESSES];
 
   while (1){
-
     // Create max_processes processes
     for(rq = 0; rq < MAX_PROCESSES; rq++){
       p_rqs[rq].pid = sys_new_process(&endless_loop, 1, argvAux, BACKGROUND, 0);
