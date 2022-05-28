@@ -114,7 +114,7 @@ void test_processes(){
       }
 
       // Randomly unblocks processes
-      for(rq = 0; rq < MAX_MEMORY; rq++)
+      for(rq = 0; rq < MAX_PROCESSES; rq++)
         if (p_rqs[rq].state == BLOCKED && GetUniform(100) % 2){
           if(sys_ready_process(p_rqs[rq].pid) == -1){
             printf("test_processes: ERROR unblocking process\n");

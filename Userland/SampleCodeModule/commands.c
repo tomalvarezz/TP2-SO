@@ -7,6 +7,7 @@
 #define COM_NUM 25
 #define STDIN 0
 #define REGISTERS 16
+#define EOF -1
 
 static char coms[COM_NUM][25] = {"/help", "/exit", "/clear", "/time", "/inforeg",
                                  "/printmem", "/zero_division", "/invalid_op_code", "/ps", "/mem", "/loop", "/kill", "/nice", "/block",
@@ -16,7 +17,7 @@ static char coms_desc[COM_NUM][80] =
      "Cierro la terminal",
      "Borro el contenido de la terminal",
      "Muestro en pantalla dia y hora del sistema",
-     "Imprimo estado actual de los registros",
+     "Imprimo estado de los registros guardados",
      "Imprimo vuelco de memoria de 32 bits, tras solicitar una direccion",
      "Lanza excepcion de division por cero",
      "Lanza excepcion de codigo de operacion invalido",
@@ -47,6 +48,10 @@ static void zeroExceptionCommand();
 static void bringTime(char* finalStr);
 static int checkArgc(int argc, int validNum);
 static void loop();
+static int isVowel(char c);
+static void filter();
+static void wc();
+static void cat();
 
 /*devuelve el numero de comando que se encuentra en el vector de strings 'coms' en caso de que el comando sea correcto, caso contrario retornara COM_NUM*/
 static int checkCommand(char* com) {
@@ -171,14 +176,14 @@ int runCommand(int argc, char* argv[]) {
             if (checkArgc(argc, 3) < 0) {
                 break;
             }
-            int pid_nice=satoi(argv[1]);
-            int prior=satoi(argv[2]);
-            if( pid_nice<0 || prior<0 ){
+            int pid_nice = satoi(argv[1]);
+            int prior = satoi(argv[2]);
+            if (pid_nice < 0 || prior < 0) {
                 printf("\nArgumento invalido\n");
                 break;
             }
 
-            if( sys_set_priority(pid_nice, prior) > 0){
+            if (sys_set_priority(pid_nice, prior) > 0) {
                 printf("\nPrioridad de proceso PID: %d cambiada a %d\n", pid_nice, prior);
             } else {
                 printf("\nNo se pudo cambiar prioridad de proceso PID: %d\n", pid_nice);
@@ -198,18 +203,18 @@ int runCommand(int argc, char* argv[]) {
                 break;
             }
 
-            int state=sys_get_process_state(pid_block);
+            int state = sys_get_process_state(pid_block);
 
-            if (state < 0){
+            if (state < 0) {
                 printf("\nEl proceso no existe\n");
                 break;
             }
 
-            if( state==READY ){
+            if (state == READY) {
                 printf("\nSe bloqueo proceso PID: %d\n", pid_block);
                 sys_block_process(pid_block);
             }
-            if (state==BLOCKED){
+            if (state == BLOCKED) {
                 printf("\nSe desbloqueo proceso PID: %d\n", pid_block);
                 sys_ready_process(pid_block);
             }
@@ -224,25 +229,24 @@ int runCommand(int argc, char* argv[]) {
             break;
 
         case 15:
-            if (checkArgc(argc, 2) < 0) {
+            if (checkArgc(argc, 1) < 0) {
                 break;
             }
-            printf("CAT\n");
+            cat();
             break;
 
         case 16:
-            if (checkArgc(argc, 2) < 0) {
+            if (checkArgc(argc, 1) < 0) {
                 break;
             }
-            printf("WC\n");
+            wc();
             break;
 
         case 17:
-            // chequear cantidad de argumentos
-            if (checkArgc(argc, 2) < 0) {
+            if (checkArgc(argc, 1) < 0) {
                 break;
             }
-            printf("FILTER\n");
+            filter();
             break;
 
         case 18:
@@ -264,8 +268,8 @@ int runCommand(int argc, char* argv[]) {
                 break;
             }
             char* argv_test_mm[] = {"Test Memory Manager"};
-            int test_mm_PID;
-            if (test_mm_PID=sys_new_process(&test_mm, 1, argv_test_mm, BACKGROUND, 0) < 0) {
+            int test_mm_PID = sys_new_process(&test_mm, 1, argv_test_mm, BACKGROUND, 0);
+            if (test_mm_PID < 0) {
                 printf("Error al crear el test memory manager");
             }
             printf("\nTesteo con PID: %d\n", test_mm_PID);
@@ -276,11 +280,11 @@ int runCommand(int argc, char* argv[]) {
                 break;
             }
             char* argv_test_processes[] = {"Test Processes"};
-            int test_pro_PID;
-            if (test_pro_PID=sys_new_process(&test_processes, 1, argv_test_processes, BACKGROUND, 0) < 0) {
-                printf("Error al crear el test processes");
+            int test_processes_PID = sys_new_process(&test_mm, 1, argv_test_mm, BACKGROUND, 0);
+            if (test_processes_PID < 0) {
+                printf("Error al crear el test memory manager");
             }
-            printf("\nTesteo con PID: %d\n", test_pro_PID);
+            printf("\nTesteo con PID: %d\n", test_processes_PID);
             break;
 
         case 22:
@@ -345,7 +349,7 @@ static void printRegisters() {
             printf("%s%x\n", strRegisters[i], registers[i]);
         }
     } else {
-        printf("Presione la tecla \'CTRL\' para guardar los registros\n");
+        printf("Presione la tecla \'CTRL\' + \'r\' para guardar los registros\n");
     }
 }
 
@@ -432,5 +436,50 @@ static void loop() {
     while (1) {
         printf("\nHOLA! Soy loop %d\n", pid);
         sys_sleep(10000);
+    }
+}
+
+static int isVowel(char c) {
+    switch (c) {
+        case 'a':
+        case 'A':
+        case 'e':
+        case 'E':
+        case 'i':
+        case 'I':
+        case 'o':
+        case 'O':
+        case 'u':
+        case 'U':
+            return 1;
+    }
+    return 0;
+}
+
+static void filter() {
+    char c;
+    while ((c = getChar()) != EOF) {
+        if (!isVowel(c)) {
+            putChar(c);
+        }
+    }
+    putChar('\n');
+}
+
+static void wc() {
+    char c;
+    int lineCount = 1;
+    while ((c = getChar()) != EOF) {
+        if (c == '\n') {
+            lineCount++;
+        }
+    }
+    printf("\nCantidad de lineas: %d\n", lineCount);
+}
+
+static void cat() {
+    int c;
+    while ((c = getChar()) != EOF) {
+        putChar(c);
     }
 }

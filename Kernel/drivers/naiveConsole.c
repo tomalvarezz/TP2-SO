@@ -38,6 +38,9 @@ void ncPrintCharColor(char character, char color)
 	else if(character=='\t'){
         ncPrint("     ");
 	}
+	else if(character=='\b'){
+		ncDeleteChar(*currentVideo);
+	}
 	else{
 		*currentVideo = character;
 		*(currentVideo+1) = color;
