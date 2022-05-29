@@ -247,8 +247,6 @@ int satoi(char* str) {
     int res = 0;
 
     // Initialize index of first digit
-    int i = 0;
-
     if (check_digit(str) == 0) {
         return -1;
     }

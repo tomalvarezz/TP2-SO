@@ -282,7 +282,7 @@ int runCommand(int argc, char* argv[]) {
                 break;
             }
             char* argv_test_processes[] = {"Test Processes"};
-            int test_processes_PID = sys_new_process(&test_mm, 1, argv_test_mm, BACKGROUND, 0);
+            int test_processes_PID = sys_new_process(&test_mm, 1, argv_test_processes, BACKGROUND, 0);
             if (test_processes_PID < 0) {
                 printf("Error al crear el test memory manager");
             }

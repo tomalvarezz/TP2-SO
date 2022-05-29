@@ -76,7 +76,7 @@ void test_processes(){
 
       if (p_rqs[rq].pid == -1){
         printf("test_processes: ERROR creating process\n");
-        return -1;
+        return;
       }else{
         p_rqs[rq].state = READY;
         alive++;
@@ -93,7 +93,7 @@ void test_processes(){
             if (p_rqs[rq].state == READY || p_rqs[rq].state == BLOCKED){
               if (sys_kill_process(p_rqs[rq].pid) == -1){  
                 printf("test_processes: ERROR killing process\n");
-                return -1;
+                return;
               }
               p_rqs[rq].state = FINISHED; 
               alive--;
@@ -104,7 +104,7 @@ void test_processes(){
             if (p_rqs[rq].state == READY){
               if(sys_block_process(p_rqs[rq].pid) == -1){
                 printf("test_processes: ERROR blocking process\n");
-                return -1;
+                return;
               }
               p_rqs[rq].state = BLOCKED; 
             }
@@ -117,7 +117,7 @@ void test_processes(){
         if (p_rqs[rq].state == BLOCKED && GetUniform(100) % 2){
           if(sys_ready_process(p_rqs[rq].pid) == -1){
             printf("test_processes: ERROR unblocking process\n");
-            return -1;
+            return;
           }
           p_rqs[rq].state = READY; 
         }
