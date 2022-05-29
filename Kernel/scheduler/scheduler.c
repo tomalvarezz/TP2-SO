@@ -1,7 +1,7 @@
-#include <stdint.h>
-#include <scheduler.h>
-#include <libraryc.h>
 #include <interrupts.h>
+#include <libraryc.h>
+#include <scheduler.h>
+#include <stdint.h>
 
 static void* const sampleCodeModuleAddress = (void*)0x400000;
 
@@ -83,7 +83,10 @@ void* scheduler(void* sp) {
 
         if (current_process->pcb.pid != base_process->pcb.pid) {
             if (current_process->pcb.state == FINISHED) {
-                /*llamo proceso padre si lo tuviera para desbloquearlo, aun sin implementar*/
+                t_process_node* parent = get_process(current_process->pcb.ppid);
+                if (parent != NULL && current_process->pcb.is_foreground && parent->pcb.state == BLOCKED) {
+                    ready_process(parent->pcb.pid);
+                }
                 free_process(current_process);
             } else {
                 queue_process(processes, current_process);
@@ -154,9 +157,9 @@ int new_process(void (*entry_point)(int, char**), int argc, char** argv,
 
     // Bloquear al proceso padre si estamos en FG y tiene proceso padre
     // Aun no implementado
-    /*if (new_process->pcb.is_foreground && new_process->pcb.ppid) {
-      block_process(new_process->pcb.ppid);
-    }*/
+    if (new_process->pcb.is_foreground && new_process->pcb.ppid) {
+        block_process(new_process->pcb.ppid);
+    }
 
     return new_process->pcb.pid;
 }
@@ -432,10 +435,10 @@ static void print_process(t_process_node* node) {
     printf("State: %s\n\n", status_to_print(node->pcb.state));
 }
 
-int get_process_state(uint64_t pid){
+int get_process_state(uint64_t pid) {
     t_process_node* process = get_process(pid);
 
-    if(process==NULL){
+    if (process == NULL) {
         return -1;
     }
     return process->pcb.state;

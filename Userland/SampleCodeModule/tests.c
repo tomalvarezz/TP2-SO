@@ -14,7 +14,7 @@ typedef struct MM_rq {
     uint32_t size;
 } mm_rq;
 
-void test_mm() {
+void test_mm(int argc, char** argv) {
     mm_rq mm_rqs[MAX_BLOCKS];
     uint8_t rq;
     uint32_t total;
@@ -61,7 +61,7 @@ typedef struct P_rq{
   int state;
 }p_rq;
 
-void test_processes(){
+void test_processes(int argc, char** argv){
   uint8_t rq;
   uint8_t alive = 0;
   uint8_t action;

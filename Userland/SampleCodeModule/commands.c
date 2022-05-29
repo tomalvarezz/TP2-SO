@@ -48,7 +48,7 @@ static void printMemory();
 static void zeroExceptionCommand();
 static void bringTime(char* finalStr);
 static int checkArgc(int argc, int validNum);
-static void loop();
+static void loop(int argc, char** argv);
 static int isVowel(char c);
 static void filter();
 static void wc();
@@ -68,6 +68,7 @@ static int checkCommand(char* com) {
 
 /*En base a un numero de comando pasado por parametro se ejecuta la funcion correspondiente, retorna la funcion en caso de que el comando sea exit=1*/
 int runCommand(int argc, char* argv[]) {
+
     int exit = 0;
 
     int com = checkCommand(argv[0]);
@@ -261,8 +262,12 @@ int runCommand(int argc, char* argv[]) {
             if (checkArgc(argc, 1) < 0) {
                 break;
             }
-
-            phylosophersProblem();       
+            char*argv_phylo[]={"Phylo problem"};
+            int phylo_PID=sys_new_process(&phylosophersProblem, 1, argv_phylo, FOREGROUND, 0);
+            if (phylo_PID < 0) {
+                printf("Error al crear el phylo problem");
+            }
+            printf("\nPhylo problem con PID: %d\n", phylo_PID);    
             break;
 
         case 20:
@@ -433,7 +438,7 @@ static void bringTime(char* finalStr) {
     strCat(finalStr, secStr);
 }
 
-static void loop() {
+static void loop(int argc, char** argv) {
     int pid = sys_get_process_pid();
     while (1) {
         printf("\nHOLA! Soy loop %d\n", pid);
