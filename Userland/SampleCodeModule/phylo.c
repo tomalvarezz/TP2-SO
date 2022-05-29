@@ -2,7 +2,7 @@
 #include <syscalls.h>
 
 #define MAX_PHILOSOPHERS 10
-#define INITIAL_PHILOSOPHERS_COUNT 5
+#define INITIAL_PHILOSOPHERS_COUNT 6
 #define SEM_MUTEX_ID 200
 #define SEM_PHILOSOPHER_ID 300
 
@@ -64,7 +64,7 @@ void phylosophersProblem(int argc, char** argv) {
             }
         }else if (key == 'r'){
             if (removePhilosopher() == -1) {
-                printf("\nNo se puede remover al filosofo\n\n", MAX_PHILOSOPHERS);
+                printf("\nNo se puede remover al filosofo, minima cantidad: %d\n\n", INITIAL_PHILOSOPHERS_COUNT);
             } else {
                 printf("\nEl filosofo se ha retirado de la mesa\n\n");
             }
@@ -130,7 +130,7 @@ static void printTable(int argc, char** argv) {
             if (philosophers[i]->state == EATING) {
                 putChar('E');
             } else {
-                putChar('-');
+                putChar('.');
             }
             putChar(' ');
         }
