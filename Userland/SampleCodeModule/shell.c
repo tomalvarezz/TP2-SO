@@ -15,6 +15,11 @@ static int userLen;
 static int getBuffer(char*, char** );
 static void shellExecute();
 
+/*static int find_pipe(int argc, char **argv);
+static void pipe_routine(int pipe_pos, int argc, char **argv);
+static int execute_pipe(int pipe_pos, int argc, char **argv);
+static int pipe_command(int argc, char **argv, int fdin, int fdout, int foreground);*/
+
 /*Funcion que se encarga de leer lo que ingrese el usuario constantemente hasta que escriba exit*/
 void shell(int argc, char** argv){
     printf("Ingrese nombre de usuario: ");
@@ -31,14 +36,14 @@ void shell(int argc, char** argv){
 }
 
 static void shellExecute(){
+    int argc;
+    char *argv[MAX_ARGUMENTS] = {0};
+    int buff_size;
+    char buffer[SIZE_BUF]={0};
 
+    //int pipePos;
 
     while (1){
-        int argc;
-        char *argv[MAX_ARGUMENTS] = {0};
-        int buff_size;
-        char buffer[SIZE_BUF]={0};
-
         putChar('$');
         sys_write(USER,user,userLen);
         printf(": ");
@@ -48,7 +53,27 @@ static void shellExecute(){
 
         argc = getBuffer(buffer,argv);
 
-        sys_new_process((void (*)(int, char **))&runCommand, argc, (char**) argv, FOREGROUND, 0);
+        if(checkCommand(argv[0])==-1){
+          printf("Comando invalido SHELL\n");
+        }
+
+        sys_new_process((void (*)(int, char **))&runCommand, argc, (char**)argv, FOREGROUND, 0);
+
+        // pipePos=find_pipe(argc, argv);
+
+        // if(pipePos >= 0){
+        //     pipe_routine(pipePos, argc, argv);
+        // }else{
+        //     if(*argv[argc-1] == '&'){
+        //         argc--;
+        //         sys_new_process(&runCommand, argc, argv, BACKGROUND, 0);
+
+        //     }else{
+        //         sys_new_process(&runCommand, argc, argv, FOREGROUND, 0);
+        //     }
+        // }
+
+        
     }
 }
 
@@ -75,3 +100,32 @@ static int getBuffer(char* buffer, char** argv){
     }
     return argc;
 }
+/*
+static int find_pipe(int argc, char **argv){
+  for (int i = 0; i < argc; i++) {
+    if (strCmp(argv[i], "|") == 0) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+static void pipe_routine(int pipe_pos, int argc, char **argv){
+  if (pipe_pos == 0 || pipe_pos == argc - 1) {
+    printf("\nPipe (|) debe ser usado entre dos comandos.\n\n");
+    return;
+  }
+  int pipe = execute_pipe(pipe_pos, argc, argv);
+  if (pipe == -1) {
+    printf("\nUno de los comandos es invalido. Use /help.\n\n");
+    return;
+  }
+}
+
+static int execute_pipe(int pipe_pos, int argc, char **argv){
+    
+}
+
+static int pipe_command(int argc, char **argv, int fdin, int fdout, int foreground){
+
+}*/

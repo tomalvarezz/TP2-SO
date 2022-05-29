@@ -40,7 +40,6 @@ static char coms_desc[COM_NUM][80] =
      "Test procesos con semaforos",
      "Test procesos sin semaforos"};
 
-static int checkCommand(char* com);
 static void printHelp();
 static void printTime();
 static void printRegisters();
@@ -53,18 +52,6 @@ static int isVowel(char c);
 static void filter();
 static void wc();
 static void cat();
-
-/*devuelve el numero de comando que se encuentra en el vector de strings 'coms' en caso de que el comando sea correcto, caso contrario retornara COM_NUM*/
-static int checkCommand(char* com) {
-    int i;
-    for (i = 0; i < COM_NUM; i++) {
-        if (strCmp(com, coms[i]) == 0) {
-            return i;
-        }
-    }
-
-    return i;
-}
 
 /*En base a un numero de comando pasado por parametro se ejecuta la funcion correspondiente, retorna la funcion en caso de que el comando sea exit=1*/
 int runCommand(int argc, char* argv[]) {
@@ -267,7 +254,8 @@ int runCommand(int argc, char* argv[]) {
             if (phylo_PID < 0) {
                 printf("Error al crear el phylo problem");
             }
-            printf("\nPhylo problem con PID: %d\n", phylo_PID);    
+            printf("\nPhylo problem con PID: %d\n", phylo_PID); 
+            sys_sleep(3000);   
             break;
 
         case 20:
@@ -316,10 +304,22 @@ int runCommand(int argc, char* argv[]) {
             break;
 
         default:
-            printf("Comando invalido\n");
+            printf("Comando invalido COMMANDS\n");
             break;
     }
     return exit;
+}
+
+/*devuelve el numero de comando que se encuentra en el vector de strings 'coms' en caso de que el comando sea correcto, caso contrario retornara COM_NUM*/
+int checkCommand(char* com) {
+    int i;
+    for (i = 0; i < COM_NUM; i++) {
+        if (strCmp(com, coms[i]) == 0) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 static int checkArgc(int argc, int validNum) {
