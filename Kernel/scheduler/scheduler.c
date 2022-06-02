@@ -101,6 +101,10 @@ void* scheduler(void* sp) {
             // No habría que realizar los mismos chequeos que más arriba
             // para ver si tiene que desbloquear o no un proceso padre?
             if (current_process->pcb.state == FINISHED) {
+                t_process_node* parent = get_process(current_process->pcb.ppid);
+                if (parent != NULL && current_process->pcb.is_foreground && parent->pcb.state == BLOCKED) {
+                    ready_process(parent->pcb.pid);
+                }
                 free_process(current_process);
             }
             if (current_process->pcb.state == BLOCKED) {
@@ -333,7 +337,6 @@ int ready_process(uint64_t pid) {
 }
 
 int kill_current_FG_process() {
-
     if (current_process != NULL && current_process->pcb.is_foreground &&
         current_process->pcb.state == READY) {
         return kill_process(current_process->pcb.pid);
@@ -410,6 +413,7 @@ void print_processes_status() {
     t_process_node* to_print = processes->first;
     while (to_print != NULL) {
         print_process(to_print);
+        sys_sleep_handler(5000);
         to_print = to_print->next;
     }
 }

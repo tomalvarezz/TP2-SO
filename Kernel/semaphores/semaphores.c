@@ -2,6 +2,7 @@
 #include <memory_manager.h>
 #include <scheduler.h>
 #include <semaphores.h>
+#include <libraryc.h>
 
 #define ERROR -1
 #define OK 0

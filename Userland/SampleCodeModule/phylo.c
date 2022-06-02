@@ -35,7 +35,7 @@ static void takeForks(int id);
 static void putForks(int id);
 static void canEat(int id);
 
-void phylosophersProblem(int argc, char** argv) {
+void phylosophersProblem() {
 
     mutex = sys_sem_open(SEM_MUTEX_ID, 1);
 
