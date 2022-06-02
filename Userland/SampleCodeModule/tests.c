@@ -20,7 +20,7 @@ void test_mm() {
     uint64_t max_memory = MAX_MEMORY;
 
     int pid = sys_get_process_pid();
-    printf("Testeo con PID: %d\n", pid);
+    printf("\nTesteo con PID: %d\n", pid);
 
     while (1) {
         rq = 0;
@@ -72,7 +72,7 @@ void test_processes() {
     p_rq p_rqs[MAX_PROCESSES];
 
     int pid = sys_get_process_pid();
-    printf("Testeo con PID: %d\n", pid);
+    printf("\nTesteo con PID: %d\n", pid);
 
     while (1) {
         // Create max_processes processes

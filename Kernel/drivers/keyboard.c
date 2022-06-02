@@ -2,6 +2,7 @@
 #include <naiveConsole.h>
 #include <syscalls_management.h>
 #include <interrupts.h>
+#include <scheduler.h>
 
 #define SIZE_BUF 200
 
@@ -160,6 +161,7 @@ void keyboard_handler() {
             //Para 
             case 'c':
             case 'C':
+                kill_current_FG_process();
 
             case 'z':
             case 'Z':

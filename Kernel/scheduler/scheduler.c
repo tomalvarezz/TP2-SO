@@ -338,7 +338,7 @@ int ready_process(uint64_t pid) {
 
 int kill_current_FG_process() {
     if (current_process != NULL && current_process->pcb.is_foreground &&
-        current_process->pcb.state == READY) {
+        current_process->pcb.state == READY  && current_process->pcb.pid > 2) {
         return kill_process(current_process->pcb.pid);
     }
 
@@ -413,7 +413,6 @@ void print_processes_status() {
     t_process_node* to_print = processes->first;
     while (to_print != NULL) {
         print_process(to_print);
-        sys_sleep_handler(5000);
         to_print = to_print->next;
     }
 }
