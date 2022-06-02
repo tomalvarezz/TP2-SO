@@ -338,7 +338,7 @@ int ready_process(uint64_t pid) {
 
 int kill_current_FG_process() {
     if (current_process != NULL && current_process->pcb.is_foreground &&
-        current_process->pcb.state == READY  && current_process->pcb.pid > 2) {
+        current_process->pcb.state == READY && current_process->pcb.pid > 2) {
         return kill_process(current_process->pcb.pid);
     }
 

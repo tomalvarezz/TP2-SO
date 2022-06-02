@@ -165,7 +165,7 @@ void loopWrapper(int argc, char** argv) {
     int pid = sys_get_process_pid();
     while (1) {
         printf("\nHOLA! Soy loop %d\n", pid);
-        sys_sleep(10000);
+        sys_sleep(5000);
     }
 }
 
@@ -212,7 +212,7 @@ void blockWrapper(int argc, char** argv){
     int state = sys_get_process_state(pid_block);
 
     if (state < 0) {
-        printf("\nEl proceso no existe\n");
+        printf("\nEl proceso PID %d no existe\n", pid_block);
         return;
     }
 

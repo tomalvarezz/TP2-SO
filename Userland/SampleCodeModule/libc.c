@@ -80,9 +80,11 @@ int strCmp(const char* s1, const char* s2) {
 
 /*Copia el string src en dest*/
 char* strCpy(char* dest, const char* src) {
-    for (int i = 0; src[i]; i++) {
+    int i;
+    for (i = 0; src[i]; i++) {
         dest[i] = src[i];
     }
+    dest[i] = 0;
     return dest;
 }
 
@@ -248,6 +250,7 @@ int satoi(char* str) {
 
     // Initialize index of first digit
     if (check_digit(str) == 0) {
+        printf("Parametro invalido, PID debe ser un numero\n");
         return -1;
     }
 

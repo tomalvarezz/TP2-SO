@@ -54,10 +54,6 @@ static void shellExecute() {
 
         argc = getBuffer(buffer, argv);
 
-        for (int i = 0; i < argc; i++) {
-            printf("%s\n", argv[i]);
-        }
-
         if (argv[argc - 1][0] == '&') {
           foreground = BACKGROUND;
           argc--;
@@ -70,7 +66,7 @@ static void shellExecute() {
 
         if (!error) {
             printf("Corriendo el comando: %s\n", argv[0]);
-            runCommand(argc, argv, foreground);
+            runCommand(argc, argv, foreground, 0);
         }
 
         // pipePos=find_pipe(argc, argv);
