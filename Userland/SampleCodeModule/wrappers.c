@@ -3,6 +3,7 @@
 #include <test_mm.h>
 #include <test_processes.h>
 #include <test_priority.h>
+#include <test_semaphores.h>
 #include <phylo.h>
 
 #define COM_NUM 25
@@ -24,7 +25,7 @@ static char coms_desc[COM_NUM][80] =
      "Lanza excepcion de division por cero",
      "Lanza excepcion de codigo de operacion invalido",
      "Muestro el estado de todos los procesos",
-     "Hago memory_dump del estado actual de memoria allocada",
+     "Hago memory_dump de la memoria allocada",
      "Creo un proceso que imprime su id cada cierto tiempo",
      "Mato un proceso dado su ID",
      "Modifico prioridad de un proceso dado su ID y una nueva prioridad",
@@ -116,7 +117,7 @@ void printRegistersWrapper(int argc, char** argv) {
             printf("%s%x\n", strRegisters[i], registers[i]);
         }
     } else {
-        printf("Presione la tecla \'CTRL\' + \'r\' para guardar los registros\n");
+        printf("Presione \'CTRL\' + \'r\' para guardar los registros\n");
     }
 }
 
@@ -299,9 +300,9 @@ void testPriorityWrapper(int argc, char** argv){
 }
 
 void testSynchroWrapper(int argc, char** argv){
-    printf("test_synchro\n");
+    test_synchro();
 }
 
 void testNoSynchroWrapper(int argc, char** argv){
-    printf("test_no_synchro\n");
+    test_no_synchro();
 }

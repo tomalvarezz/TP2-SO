@@ -113,7 +113,7 @@ uint64_t syscall_handler(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,
             return pipe_open((uint64_t) rdi);
         
         case 26:
-            return pipe_write((uint64_t) rdi, (char*)rsi);
+            return pipe_write((uint64_t) rdi, (char*)rsi, (uint64_t) rdx);
         
         case 27:
             return pipe_read((uint64_t) rdi);
@@ -179,7 +179,7 @@ uint64_t sys_write_handler(uint64_t fd, const char* buf, uint64_t count) {
             ncPrintCharColor(buf[i], 0x02);
     }
     else {
-        pipe_write(fd, buf);
+        pipe_write(fd, buf, count);
     }
 
     return count;

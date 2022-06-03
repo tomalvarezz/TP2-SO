@@ -2,7 +2,7 @@
 #include <semaphores.h>
 #include <libraryc.h>
 
-#define BUFFER_SIZE 1204
+#define BUFFER_SIZE 1024
 #define MAX_PIPES 8
 #define EOF -1
 
@@ -25,7 +25,6 @@ static t_pipe pipes[MAX_PIPES];
 static uint64_t create_pipe(uint64_t id);
 static uint64_t get_new_index();
 static uint64_t get_index(uint64_t id);
-static uint64_t pipe_writer(char c, uint64_t idx);
 
 uint64_t pipe_open(uint64_t id) {
     uint64_t idx;
@@ -39,15 +38,23 @@ uint64_t pipe_open(uint64_t id) {
     return id;
 }
 
-uint64_t pipe_write(uint64_t id, char* str) {
+uint64_t pipe_write(uint64_t id, char* str, uint64_t count) {
     uint64_t idx = get_index(id);
     if (idx == -1) {
         return -1;
     }
     uint64_t i = 0;
 
-    while (str[i] != 0) {
-        pipe_writer(str[i], idx);
+    t_pipe* pipe = &(pipes[idx]);
+
+    while (i < count) {
+        sem_wait(pipe->write_sem);
+
+        pipe->buffer[pipe->step_to_write] = str[i];
+        pipe->step_to_write = (pipe->step_to_write + 1) % BUFFER_SIZE;
+
+        sem_post(pipe->read_sem);
+
         i++;
     }
     return id;
@@ -66,7 +73,7 @@ uint64_t pipe_read(uint64_t id) {
     char c = pipe->buffer[pipe->step_to_read];
     pipe->step_to_read = (pipe->step_to_read + 1) % BUFFER_SIZE;
 
-    sem_post(pipe->step_to_write);
+    sem_post(pipe->write_sem);
 
     return c;
 }
@@ -148,18 +155,4 @@ static uint64_t create_pipe(uint64_t id) {
     }
 
     return id;
-}
-
-static uint64_t pipe_writer(char c, uint64_t idx) {
-    t_pipe* pipe = &(pipes[idx]);
-
-    sem_wait(pipe->write_sem);
-
-    pipe->buffer[pipe->step_to_write] = c;
-
-    pipe->step_to_write = (pipe->step_to_write + 1) % BUFFER_SIZE;
-
-    sem_post(pipe->read_sem);
-
-    return 0;
 }

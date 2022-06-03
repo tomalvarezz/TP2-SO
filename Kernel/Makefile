@@ -36,6 +36,7 @@ all: $(KERNEL)
 
 $(KERNEL): $(STATICLIBS) $(ALL_OBJECTS)
 	$(LD) $(LDFLAGS) -T kernel.ld -o $@ $^
+	$(LD) $(LDFLAGS) -T kernel.ld -o kernel.elf --oformat=elf64-x86-64 $^
 
 %.o: %.c
 	$(GCC) $(GCCFLAGS) -I./include $(MM_SELECTOR) -c $< -o $@

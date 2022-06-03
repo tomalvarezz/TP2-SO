@@ -44,7 +44,7 @@ extern uint64_t sys_sem_status();
 
 // Syscalls pipes
 extern uint64_t sys_pipe_open(uint32_t id);
-extern uint64_t sys_pipe_write(uint32_t id, char* str);
+extern uint64_t sys_pipe_write(uint32_t id, char* str, uint64_t count);
 extern uint64_t sys_pipe_read(uint32_t id);
 extern uint64_t sys_pipe_close(uint32_t id);
 extern uint64_t sys_pipe_status();

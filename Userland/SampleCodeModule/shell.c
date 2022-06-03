@@ -76,7 +76,9 @@ static void shellExecute() {
                 argc--;
                 foreground = BACKGROUND;
             }
-            runCommand(argc, argv, foreground, 0);
+            if (runCommand(argc, argv, foreground, 0)==-1){
+                printf("No pudo correrse el comando\n");
+            }
         }
     }
 }
@@ -161,8 +163,8 @@ static int execute_pipe(int pipe_pos, int argc, char** argv) {
         return -1;
     }
 
-    //int endOfFile = EOF;
-    sys_pipe_write(pipe, (char*) EOF);
+    char eof_buffer=EOF;
+    sys_pipe_write(pipe, &eof_buffer, 1);
 
     sys_pipe_close(pipe);
     putChar('\n');
