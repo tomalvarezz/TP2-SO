@@ -132,7 +132,6 @@ uint64_t syscall_handler(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,
 }
 
 uint64_t sys_read_handler(uint64_t fd, char* buf, uint64_t count) {
-
     _sti();
     char* inBuffer;
     int sizebuff;
@@ -155,20 +154,23 @@ uint64_t sys_read_handler(uint64_t fd, char* buf, uint64_t count) {
     }
 
     cleanBuffer();
-
     return i;
 }
 
 uint64_t sys_write_handler(uint64_t fd, const char* buf, uint64_t count) {
+    fd=get_current_process_write_FD();
+
     // en caso de que el file descriptior sea salida estandar imprimimos en pantalla lo que se encuentre en buf
     if (fd == STDOUT) {
         for (int i = 0; i < count; i++)
             ncPrintChar(buf[i]);
-
         // en caso de que el file descriptor sea USER(define hecho en el codigo) imprimimos en pantalla lo que se encuentre en buff de color verde y fondo negro
     } else if (fd == USER) {
         for (int i = 0; i < count; i++)
             ncPrintCharColor(buf[i], 0x02);
+    }
+    else {
+        pipe_write(fd, buf);
     }
 
     return count;

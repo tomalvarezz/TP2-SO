@@ -15,6 +15,8 @@ static t_process_node* base_process;
 #define BACKGROUND_PRIORITY_DEFAULT 1
 #define FOREGROUND_PRIORITY_DEFAULT 2
 #define MAX_PRIORITY 50
+#define STDIN 0
+#define STDOUT 1
 
 typedef struct {
     uint64_t gs;
@@ -198,8 +200,8 @@ static int initialize_pcb(PCB* PCB, char* name, uint8_t foreground, int* fd) {
     PCB->priority = PCB->is_foreground ? FOREGROUND_PRIORITY_DEFAULT
                                        : BACKGROUND_PRIORITY_DEFAULT;
 
-    PCB->fd[0] = (fd ? fd[0] : 0);
-    PCB->fd[1] = (fd ? fd[1] : 1);
+    PCB->fd[0] = (fd ? fd[0] : STDIN);
+    PCB->fd[1] = (fd ? fd[1] : STDOUT);
 
     PCB->RBP = (void*)((char*)PCB->RBP + SIZE_OF_STACK - 1);
 

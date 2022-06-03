@@ -241,6 +241,7 @@ void wcWrapper(int argc, char** argv){
     char c;
     int lineCount = 1;
     while ((c = getChar()) != EOF) {
+        putChar(c);
         if (c == '\n') {
             lineCount++;
         }

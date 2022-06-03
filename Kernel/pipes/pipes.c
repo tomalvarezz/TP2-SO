@@ -49,7 +49,6 @@ uint64_t pipe_write(uint64_t id, char* str) {
         pipe_writer(str[i], idx);
         i++;
     }
-
     return id;
 }
 
