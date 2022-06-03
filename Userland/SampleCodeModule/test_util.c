@@ -3,6 +3,7 @@
 #include <syscalls.h>
 #include <test_util.h>
 
+
 //Random
 static uint32_t m_z = 362436069;
 static uint32_t m_w = 521288629;
@@ -42,11 +43,11 @@ void endless_loop(){
   }
 }
 
-void endless_loop_print(uint64_t wait){
+void endless_loop_print(){
   uint64_t pid = sys_get_process_pid();
 
   while(1){
     printf("%d ",pid);
-    bussy_wait(wait);
+    bussy_wait(WAIT);
   }
 }

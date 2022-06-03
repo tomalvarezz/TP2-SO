@@ -157,8 +157,6 @@ static uint64_t pipe_writer(char c, uint64_t idx) {
 
     pipe->buffer[pipe->step_to_write] = c;
 
-    //printf("write %c", c);
-
     pipe->step_to_write = (pipe->step_to_write + 1) % BUFFER_SIZE;
 
     sem_post(pipe->read_sem);

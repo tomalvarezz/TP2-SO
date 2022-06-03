@@ -1,6 +1,8 @@
 #include <syscalls.h>
 #include <libc.h>
-#include <tests.h>
+#include <test_mm.h>
+#include <test_processes.h>
+#include <test_priority.h>
 #include <phylo.h>
 
 #define COM_NUM 25
@@ -293,7 +295,7 @@ void testProcessesWrapper(int argc, char** argv){
 }
 
 void testPriorityWrapper(int argc, char** argv){
-    printf("test_priority\n");
+    test_priority();
 }
 
 void testSynchroWrapper(int argc, char** argv){
