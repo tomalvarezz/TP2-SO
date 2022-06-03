@@ -4,6 +4,7 @@
 
 #define BUFFER_SIZE 1204
 #define MAX_PIPES 8
+#define EOF -1
 
 #define IN_USE 1
 #define EMPTY 0
@@ -92,7 +93,7 @@ uint64_t pipe_close(uint64_t id) {
 }
 
 void pipe_status() {
-    printf("\n\nEstado de pipes activos\n\n");
+    printf("\nEstado de pipes activos\n");
     for (int i = 0; i < MAX_PIPES; i++) {
         t_pipe pipe = pipes[i];
         if (pipe.state == IN_USE) {
@@ -155,6 +156,9 @@ static uint64_t pipe_writer(char c, uint64_t idx) {
     sem_wait(pipe->write_sem);
 
     pipe->buffer[pipe->step_to_write] = c;
+
+    //printf("write %c", c);
+
     pipe->step_to_write = (pipe->step_to_write + 1) % BUFFER_SIZE;
 
     sem_post(pipe->read_sem);

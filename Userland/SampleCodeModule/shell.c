@@ -141,12 +141,6 @@ static int execute_pipe(int pipe_pos, int argc, char** argv) {
         currentArgc++;
     }
 
-    for (int i = 0; i < currentArgc; i++)
-    {
-      printf("Argv[%d]: %s\n", i, currentArgv[i]);
-    }
-    sys_sleep(5000);
-    
     //Proceso que lee del pipe
     pids[0] = pipe_command(currentArgc, currentArgv, BACKGROUND, pipe, STDOUT);
     if (pids[0] == -1) {
@@ -159,13 +153,6 @@ static int execute_pipe(int pipe_pos, int argc, char** argv) {
         currentArgv[i] = argv[i];
         currentArgc++;
     }
-
-      for (int i = 0; i < currentArgc; i++)
-    {
-      printf("Argv[%d]: %s\n", i, currentArgv[i]);
-    }
-
-    sys_sleep(5000);
 
     //Proceso que escribe en el pipe
     pids[1] = pipe_command(currentArgc, currentArgv, FOREGROUND, STDIN, pipe);

@@ -10,6 +10,7 @@
 #define STDOUT 1
 #define USER 2
 #define REGISTERS 16
+#define EOF -1
 
 static uint64_t registers[REGISTERS];
 static int canPrintRegisters = 0;
@@ -132,28 +133,36 @@ uint64_t syscall_handler(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,
 }
 
 uint64_t sys_read_handler(uint64_t fd, char* buf, uint64_t count) {
-    _sti();
-    char* inBuffer;
-    int sizebuff;
+    int i=0;
+    fd=get_current_process_read_FD();
+    if(fd==STDIN){
+        _sti();
+        char* inBuffer;
+        int sizebuff;
 
-    // colocamos en *inBuffer lo que el ingresa el usuario hasta el '/n'
-    do {
-        inBuffer = getBuffer();
-        // con esta instruccion logramos que no este pidiendo constantemente una tecla, sino que espera a la proxima interrupcion
-        _hlt();
-    } while ((sizebuff = sizeBuffer()) < count && inBuffer[sizebuff - 1] != '\n');
+        // colocamos en *inBuffer lo que el ingresa el usuario hasta el '/n'
+        do {
+            inBuffer = getBuffer();
+            // con esta instruccion logramos que no este pidiendo constantemente una tecla, sino que espera a la proxima interrupcion
+            _hlt();
+        } while ((sizebuff = sizeBuffer()) < count && inBuffer[sizebuff - 1] != '\n');
 
-    _cli();
-
-    // colocamos en buf lo que el usuario volco en el buffer siempre y cuando el file descriptor sea entrada estandar
-    int i;
-    if (fd == STDIN) {
+        _cli();
+        
+        // colocamos en buf lo que el usuario volco en el buffer siempre y cuando el file descriptor sea entrada estandar
         for (i = 0; i < count && i < sizebuff; i++) {
             buf[i] = inBuffer[i];
         }
+        cleanBuffer();
     }
-
-    cleanBuffer();
+    else{
+        char c;
+        while(i<count){
+            c=pipe_read(fd);
+            buf[i++]=c;
+        }
+    }
+    
     return i;
 }
 
@@ -182,7 +191,7 @@ uint64_t sys_time_handler(uint64_t time) {
     return RTC(time);
 }
 
-/*Recibe un vector con los 19 registros y los deposita en el vector dest*/
+/*Recibe un vector con los 16 registros y los deposita en el vector dest*/
 int sys_get_registers_handler(uint64_t* dest) {
     if (canPrintRegisters) {
         for (int i = 0; i < REGISTERS; i++) {
