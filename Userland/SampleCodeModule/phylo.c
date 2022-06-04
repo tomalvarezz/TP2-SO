@@ -1,4 +1,7 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <libc.h>
+#include <stddef.h>
 #include <syscalls.h>
 
 #define MAX_PHILOSOPHERS 10
@@ -88,6 +91,10 @@ static int addPhilosopher() {
     sys_sem_wait(mutex);
 
     t_philosopher* philosopher = malloc(sizeof(t_philosopher));
+
+    if(philosopher==NULL){
+        return -1;
+    }
 
     philosopher->sem = sys_sem_open(SEM_PHILOSOPHER_ID + philosopherCount, 1);
     philosopher->state = THINKING;

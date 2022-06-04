@@ -54,7 +54,7 @@ void* malloc(uint64_t malloc_bytes) {
 
     node_found = TRUE;
 
-    for (current_node = prevptr->data.ptr; node_found; current_node->data.ptr) {
+    for (current_node = prevptr->data.ptr; node_found; current_node=current_node->data.ptr) {
         if (current_node->data.size >= malloc_units) {
             if (current_node->data.size == malloc_units) {
                 prevptr->data.ptr = current_node->data.ptr;

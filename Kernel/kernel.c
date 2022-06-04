@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <stdint.h>
 #include <lib.h>
 #include <moduleLoader.h>
@@ -11,7 +13,7 @@
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
-#define HEAP_SIZE 1024 * 1024 * 64 // 64MB
+#define HEAP_SIZE (1024 * 1024 * 64) // 64MB
 
 extern uint8_t text;
 extern uint8_t rodata;

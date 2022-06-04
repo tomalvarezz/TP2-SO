@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <scheduler_queue.h>
 
 void queue_process(t_process_list *processes, t_process_node *process){
