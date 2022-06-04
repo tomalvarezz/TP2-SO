@@ -96,6 +96,29 @@ void free(void* block) {
 
 void memory_dump() {
     printf("\nUtilizando BUDDY_MEMORY_MANAGER\n");
+     list_t *list, *listAux;
+  uint32_t idx = 0;
+  uint32_t spaceAvailable = 0;
+
+  printf("VUELCO DE MEMORIA\n");
+  printf("\nNiveles con bloques libres:\n\n");
+
+  for (int i = levels_amount - 1; i >= 0; i--) {
+    list = &levels[i];
+    if (!is_empty(list)) {
+      printf("    Nivel %d\n", i + MIN_ALLOC_LOG2);
+      printf("    Bloques de tamanio 2^%d\n", i + MIN_ALLOC_LOG2);
+      for (listAux = list->next, idx = 1; listAux != list;
+           idx++, listAux = listAux->next) {
+        if (listAux->free) {
+          printf("        Numero de bloque: %d\n", idx);
+          printf("        Estado: free\n\n");
+          spaceAvailable += idx * (1 << (MIN_ALLOC_LOG2 + i));
+        }
+      }
+    }
+  }
+  printf("\nEspacio disponible: %d\n\n", spaceAvailable);
 }
 
 static void add_to_level(list_t* list, list_t* node, uint8_t tree_level) {

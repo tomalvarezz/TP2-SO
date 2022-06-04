@@ -1,5 +1,4 @@
 
-MM_SELECTOR=KR_MEMORY_MANAGER
 
 all:  bootloader kernel userland image
 
@@ -7,7 +6,7 @@ bootloader:
 	cd Bootloader; make all
 
 kernel:
-	cd Kernel; make all MM_SELECTOR=-D$(MM_SELECTOR)
+	cd Kernel; make all 
 
 userland:
 	cd Userland; make all

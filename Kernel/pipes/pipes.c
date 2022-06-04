@@ -5,7 +5,7 @@
 #include <libraryc.h>
 
 #define BUFFER_SIZE 1024
-#define MAX_PIPES 8
+#define MAX_PIPES 5
 #define EOF -1
 
 #define IN_USE 1
