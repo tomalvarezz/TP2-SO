@@ -23,7 +23,7 @@ char getChar() {
 Tiene la capacidad de recibir formatos en el mismo, para mas informacion de la implementacion ingresar a: https://www.tutorialspoint.com/c_standard_library/stdarg_h.htm */
 void printf(char* string, ...) {
     int i = 0, indexBuffer = 0;
-    char buff[100] = {0}, aux[20];
+    char buff[1024] = {0}, aux[20];
     char* aux_str;
     va_list ap;
     va_start(ap, string);

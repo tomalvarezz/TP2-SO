@@ -165,9 +165,6 @@ static int execute_pipe(int pipe_pos, int argc, char** argv) {
         return -1;
     }
 
-    char eof_buffer=EOF;
-    sys_pipe_write(pipe, &eof_buffer, 1);
-
     sys_pipe_close(pipe);
     putChar('\n');
     return 1;

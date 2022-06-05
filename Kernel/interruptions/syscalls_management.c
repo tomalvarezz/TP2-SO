@@ -18,10 +18,6 @@ static uint64_t registers[REGISTERS];
 static int canPrintRegisters = 0;
 
 /*En base a el codigo de syscall, que se encuentra en rax, se llama a la funcion del handler correspondiente*/
-// Agregar más registros para poder realizar la syscall new_process
-
-// uint64_t rax, uint64_t rdi,uint64_t rsi, uint64_t rdx, uint64_t rsp
-
 uint64_t syscall_handler(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8, uint64_t rax) {
     switch (rax) {
         case 0:

@@ -160,10 +160,11 @@ void keyboard_handler() {
                   buffer[index_buffer++] = EOF;
                 }
 
-            //Para 
             case 'c':
             case 'C':
-                kill_current_FG_process();
+                if(controlFlag){
+                    kill_current_FG_process();
+                }
 
             case 'z':
             case 'Z':

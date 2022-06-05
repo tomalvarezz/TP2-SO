@@ -4,6 +4,7 @@
 #include <libraryc.h>
 #include <scheduler.h>
 #include <stdint.h>
+#include <pipes.h>
 
 static void* const sampleCodeModuleAddress = (void*)0x400000;
 
@@ -19,6 +20,7 @@ static t_process_node* base_process;
 #define MAX_PRIORITY 50
 #define STDIN 0
 #define STDOUT 1
+#define EOF -1
 
 typedef struct {
     uint64_t gs;
@@ -268,6 +270,10 @@ static void initialize_process_stack_frame(void (*entryPoint)(int, char**),
 }
 
 static void free_process(t_process_node* process) {
+    if(process->pcb.fd[1]!=STDOUT){
+        char eof_buffer=EOF;
+        pipe_write(process->pcb.fd[1], &eof_buffer, 1);
+    }
     for (int i = 0; i < process->pcb.argc; i++) {
         free(process->pcb.argv[i]);
     }
@@ -446,7 +452,7 @@ int get_process_state(uint64_t pid) {
     t_process_node* process = get_process(pid);
 
     if (process == NULL) {
-        return -1;
+        return FINISHED;
     }
     return process->pcb.state;
 }
