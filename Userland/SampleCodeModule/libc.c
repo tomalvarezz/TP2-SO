@@ -246,23 +246,24 @@ void free(void* address) {
 }
 
 // AGODIO
-int satoi(char* str) {
-    // Initialize result
-    int res = 0;
+int satoi(char* str){
+  int i = 0;
+  int res = 0;
+  int sign = 1;
 
-    // Initialize index of first digit
-    if (check_digit(str) == 0) {
-        printf("Parametro invalido, PID debe ser un numero\n");
-        return -1;
-    }
+  if (!str) return 0;
 
-    // Iterate through all digits
-    // and update the result
-    for (int i = 0; str[i] != '\0'; ++i)
-        res = res * 10 + str[i] - '0';
+  if (str[i] == '-'){
+    i++;
+    sign = -1;
+  }
 
-    // Return result with sign
-    return res;
+  for ( ; str[i] != '\0'; ++i){
+    if(str[i] < '0' || str[i] > '9') return 0;
+    res = res * 10 + str[i] - '0';
+  }
+
+  return res * sign;
 }
 
 int check_digit(char* str) {

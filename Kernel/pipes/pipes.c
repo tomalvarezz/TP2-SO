@@ -106,7 +106,7 @@ void pipe_status() {
     for (int i = 0; i < MAX_PIPES; i++) {
         t_pipe pipe = pipes[i];
         if (pipe.state == IN_USE) {
-            printf("\tID: %d\n", pipe.id);
+            printf("\n\tID: %d\n", pipe.id);
             printf("\tNro de procesos asociados: %d\n", pipe.total_processes);
             printf("\tSemaforo de read: %d\n", pipe.read_sem);
             printf("\tSemaforo de write: %d\n", pipe.write_sem);

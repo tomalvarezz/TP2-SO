@@ -157,7 +157,6 @@ static int execute_pipe(int pipe_pos, int argc, char** argv) {
         return -1;
     }
 
-    sys_pipe_close(pipe);
     putChar('\n');
     return 1;
 }

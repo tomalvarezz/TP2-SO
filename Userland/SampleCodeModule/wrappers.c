@@ -176,7 +176,7 @@ void memoryDumpWrapper(int argc, char** argv) {
 void loopWrapper(int argc, char** argv) {
     int pid = sys_get_process_pid();
     while (1) {
-        printf("\nHOLA! Soy loop %d\n", pid);
+        printf("\nHola soy el loop con PID %d. Me imprimo cada 5 segundos\n", pid);
         sys_sleep(5000);
     }
 }
@@ -184,7 +184,7 @@ void loopWrapper(int argc, char** argv) {
 void killProcessWrapper(int argc, char** argv) {
     int pid_kill = satoi(argv[1]);
 
-    if (pid_kill < 0) {
+    if (pid_kill == 0) {
         printf("\nArgumento invalido\n");
         return;
     }
@@ -201,7 +201,7 @@ void killProcessWrapper(int argc, char** argv) {
 void niceWrapper(int argc, char** argv) {
     int pid_nice = satoi(argv[1]);
     int prior = satoi(argv[2]);
-    if (pid_nice < 0 || prior < 0) {
+    if (pid_nice == 0 || prior == 0) {
         printf("\nArgumento invalido\n");
         return;
     }
@@ -216,14 +216,14 @@ void niceWrapper(int argc, char** argv) {
 void blockWrapper(int argc, char** argv){
     int pid_block = satoi(argv[1]);
 
-    if (pid_block < 0) {
+    if (pid_block == 0) {
         printf("\nArgumento invalido\n");
         return;
     }
 
     int state = sys_get_process_state(pid_block);
 
-    if (state < 0) {
+    if (state == FINISHED) {
         printf("\nEl proceso PID %d no existe\n", pid_block);
         return;
     }

@@ -40,6 +40,13 @@ static void canEat(int id);
 
 void phylosophersProblem() {
 
+    printf("Instrucciones:\nPresione 'a' para agregar un filosofo\nPresione 'r' para remover un filosofo\nPresione 'f' para finalizar\n");
+
+    char c;
+    do{
+        printf("cuando este listo presione 'c' para continuar\n");
+    }while((c = getChar()) != 'c');
+
     mutex = sys_sem_open(SEM_MUTEX_ID, 1);
 
     for (int i = 0; i < INITIAL_PHILOSOPHERS_COUNT; i++) {

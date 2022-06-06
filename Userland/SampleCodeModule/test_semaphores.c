@@ -8,7 +8,7 @@
 #define SEM_ID 50
 #define TOTAL_PAIR_PROCESSES 2
 
-uint64_t global; // shared memory
+int global; // shared memory
 
 static void slowInc(uint64_t* p, uint64_t inc) {
     uint64_t aux = *p;
@@ -23,11 +23,7 @@ static void inc(int argc, char* argv[]) {
     uint64_t N = satoi(argv[3]);
     uint64_t i;
 
-    for (int j = 0; j < argc; j++)
-    {
-        printf("argv[%d]: %s\n", j, argv[j]);
-    }
-    
+    printf("Comenzando testeo de semaforos\n");
 
     if (sem && sys_sem_open(SEM_ID, 1) == -1) {
         printf("ERROR OPENING SEM\n");
@@ -58,18 +54,20 @@ void test_no_synchro() {
 
     printf("Valor inicial: %d\n", global);
 
-    for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-        char* argInc[] = {"Inc sin sem", "0", "1", "100000"};
-        sys_new_process(&inc, 4, argInc, BACKGROUND, 0);
-        char* argDec[] = {"Inc sin sem", "0", "-1", "100000"};
-        sys_new_process(&inc, 4, argDec, BACKGROUND, 0);
-    }
+    char* argInc[] = {"Inc con sem", "1", "1", "10000"};
+    int pid1=sys_new_process(&inc, 4, argInc, BACKGROUND, 0);
+    char* argDec[] = {"Inc con sem", "1", "-1", "10000"};
+    int pid2=sys_new_process(&inc, 4, argDec, BACKGROUND, 0);
 
+    sys_kill_process(pid1);
+    sys_kill_process(pid2);
     printf("Valor final: %d\n", global);
 }
 
 void test_synchro() {
     uint64_t i;
+
+
 
     global = 0;
 
@@ -77,12 +75,14 @@ void test_synchro() {
 
     printf("Valor inicial: %d\n", global);
 
-    for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-        char* argInc[] = {"Inc con sem", "1", "1", "100000"};
-        sys_new_process(&inc, 4, argInc, BACKGROUND, 0);
-        char* argDec[] = {"Inc con sem", "1", "-1", "100000"};
-        sys_new_process(&inc, 4, argDec, BACKGROUND, 0);
-    }
+    char* argInc[] = {"Inc con sem", "1", "1", "10000"};
+    int pid1=sys_new_process(&inc, 4, argInc, BACKGROUND, 0);
+    char* argDec[] = {"Inc con sem", "1", "-1", "10000"};
+    int pid2=sys_new_process(&inc, 4, argDec, BACKGROUND, 0);
+
+    sys_kill_process(pid1);
+    sys_kill_process(pid2);
+
 
     printf("Valor final: %d\n", global);
 }
