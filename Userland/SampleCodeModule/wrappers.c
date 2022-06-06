@@ -8,17 +8,17 @@
 #include <test_semaphores.h>
 #include <phylo.h>
 
-#define COM_NUM 25
+#define COM_NUM 26
 #define REGISTERS 16
 #define STDIN 0
 #define EOF -1
 
-static char coms[COM_NUM][25] = {"/help", "/exit", "/clear", "/time", "/inforeg",
+static char *coms[COM_NUM] = {"/dummy", "/exit", "/clear", "/time", "/inforeg",
                                  "/printmem", "/zero_division", "/invalid_op_code", "/ps", "/mem", "/loop", "/kill", "/nice", "/block",
-                                 "/sem", "/cat", "/wc", "/filter", "/pipe", "/phylo", "/test_mm", "/test_processes", "/test_priority", "/test_synchro", "/test_no_synchro"};
+                                 "/sem", "/cat", "/wc", "/filter", "/pipe", "/phylo", "/test_mm", "/test_processes", "/test_priority", "/test_synchro", "/test_no_synchro", "/help"};
 
-static char coms_desc[COM_NUM][80] =
-    {"Muestro ayuda",
+static char *coms_desc[COM_NUM] =
+    {"Comando dummy como testeo",
      "Cierro la terminal",
      "Borro el contenido de la terminal",
      "Muestro en pantalla dia y hora del sistema",
@@ -42,7 +42,14 @@ static char coms_desc[COM_NUM][80] =
      "Test creacion de varios procesos",
      "Test procesos con distintas prioridades",
      "Test procesos con semaforos",
-     "Test procesos sin semaforos"};
+     "Test procesos sin semaforos",
+     "Muestro ayuda",
+     };
+
+
+void dummyWrapper(int argc, char** argv){
+    printf("Soy dummy\n");
+}
 
 void printHelpWrapper(int argc, char** argv) {
     for (int i = 0; i < COM_NUM; i++) {

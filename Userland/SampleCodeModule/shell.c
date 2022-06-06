@@ -46,9 +46,10 @@ static void shellExecute() {
     char buffer[SIZE_BUF] = {0};
     int foreground;
 
+    char* argv[MAX_ARGUMENTS] = {0};
+    int argc;
+
     while (1) {
-        char* argv[MAX_ARGUMENTS] = {0};
-        int argc;
         foreground = FOREGROUND;
         putChar('$');
         sys_write(USER, user, userLen);
@@ -61,16 +62,6 @@ static void shellExecute() {
 
         pipeIdx = find_pipe(argc, argv);
 
-        /*if (argv[argc - 1][0] == '&') {
-            foreground = BACKGROUND;
-            argc--;
-        }*/
-
-        /*if (checkCommand(argv[0]) == -1) {
-            printf("Comando invalido SHELL\n");
-            error = 1;
-        }*/
-
         if (pipeIdx >= 0) {
             pipe_routine(pipeIdx, argc, argv);
         } else {
@@ -78,6 +69,7 @@ static void shellExecute() {
                 argc--;
                 foreground = BACKGROUND;
             }
+
             if (runCommand(argc, argv, foreground, 0)==-1){
                 printf("No pudo correrse el comando\n");
             }

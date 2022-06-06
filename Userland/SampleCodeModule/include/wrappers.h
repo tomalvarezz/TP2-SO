@@ -1,6 +1,7 @@
 #ifndef _WRAPPERS_H_
 #define _WRAPPERS_H_
 
+void dummyWrapper(int argc, char** argv);
 void printHelpWrapper(int argc, char** argv);
 int exitUserlandWrapper(int argc, char** argv);
 void clearWrapper(int argc, char** argv);

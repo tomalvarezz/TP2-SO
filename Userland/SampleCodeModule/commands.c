@@ -6,32 +6,26 @@
 #include <wrappers.h>
 #include <libc.h>
 
-#define COM_NUM 25
+#define COM_NUM 26
 
-static char coms[COM_NUM][25] = {"/help", "/exit", "/clear", "/time", "/inforeg",
+static char *coms[COM_NUM] = {"/dummy", "/exit", "/clear", "/time", "/inforeg",
                                  "/printmem", "/zero_division", "/invalid_op_code", "/ps", "/mem", "/loop", "/kill", "/nice", "/block",
-                                 "/sem", "/cat", "/wc", "/filter", "/pipe", "/phylo", "/test_mm", "/test_processes", "/test_priority", "/test_synchro", "/test_no_synchro"};
+                                 "/sem", "/cat", "/wc", "/filter", "/pipe", "/phylo", "/test_mm", "/test_processes", "/test_priority", "/test_synchro", "/test_no_synchro", "/help"};
 
 static int checkArgc(int argc, int validNum);
 
 /*En base a un numero de comando pasado por parametro se ejecuta la funcion correspondiente, retorna la funcion en caso de que el comando sea exit=1*/
 int runCommand(int argc, char* argv[], int foreground, int* fd) {
-    int exit = 0;
 
     int com = checkCommand(argv[0]);
 
     switch (com) {
         case 0:
-            if (checkArgc(argc, 1) < 0) {
-                break;
-            }
-            return sys_new_process((void (*)(int, char**)) &printHelpWrapper, argc, (char**)argv, foreground, fd);
+            return sys_new_process((void (*)(int, char**)) &dummyWrapper, argc, (char**)argv, foreground, fd);
 
         case 1:
-            if (checkArgc(argc, 1) < 0) {
-                break;
-            }
-            break;
+            printf("Comando /exit ya no se encuentra disponible\n");
+            return 1;
 
         case 2:
             if (checkArgc(argc, 1) < 0) {
@@ -171,6 +165,13 @@ int runCommand(int argc, char* argv[], int foreground, int* fd) {
             }
             return sys_new_process((void (*)(int, char**)) &testNoSynchroWrapper, argc, (char**)argv, foreground, fd);
 
+        case 25:
+            if (checkArgc(argc, 1) < 0) {
+                break;
+            }
+            
+            return sys_new_process((void (*)(int, char**)) &printHelpWrapper, argc, (char**)argv, foreground, fd);
+
         default:
             printf("Comando invalido COMMANDS\n");
             break;
@@ -190,8 +191,9 @@ int checkCommand(char* com) {
 }
 
 static int checkArgc(int argc, int validNum) {
+
     if (argc == validNum) {
-        return 0;
+        return 1;
     }
     printf("\nCantidad de parametros invalido\n");
     printf("\nCantidad de parametros esperado es: %d\n", validNum);
