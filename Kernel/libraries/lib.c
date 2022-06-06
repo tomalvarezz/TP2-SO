@@ -47,8 +47,7 @@ void* memcpy(void* destination, const void* source, uint64_t length) {
 }
 
 void acquire(int* lock) {
-    while (exchange(lock, 1) != 0)
-        ;
+    while (exchange(lock, 1) != 0);
 }
 
 void release(int* lock) {
