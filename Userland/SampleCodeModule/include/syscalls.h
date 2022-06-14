@@ -49,6 +49,9 @@ extern uint64_t sys_pipe_read(uint32_t id);
 extern uint64_t sys_pipe_close(uint32_t id);
 extern uint64_t sys_pipe_status();
 
+// Shared memory
+extern uint64_t sys_shm_open(int id);
+
 extern uint64_t sys_invalid_op_code();
 
 #endif

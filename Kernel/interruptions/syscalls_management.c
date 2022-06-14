@@ -8,6 +8,8 @@
 #include <semaphores.h>
 #include <pipes.h>
 
+#include <shared_memory.h>
+
 #define STDIN 0
 #define STDOUT 1
 #define USER 2
@@ -122,6 +124,9 @@ uint64_t syscall_handler(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx,
         case 29:
             pipe_status((uint64_t) rdi);
             break;
+
+        case 30:
+            return shm_open((int) rdi);
 
         default:
             break;

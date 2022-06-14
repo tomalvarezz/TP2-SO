@@ -31,7 +31,7 @@ GLOBAL sys_pipe_read
 GLOBAL sys_pipe_close
 GLOBAL sys_pipe_status
 
-
+GLOBAL sys_shm_open
 GLOBAL sys_invalid_op_code
 
 ;Cabe aclarar que en todas las funciones se realiza el armado y desarmado del stackFrame, el cual no es extrictamente necesario
@@ -359,6 +359,17 @@ sys_pipe_status:
 	mov rbp, rsp
 	push rbx
 	mov rax, 0x1D
+	int 80h
+	pop rbx
+	mov rsp, rbp
+	pop rbp
+	ret
+
+sys_shm_open:
+	push rbp
+	mov rbp, rsp
+	push rbx
+	mov rax, 0x1E
 	int 80h
 	pop rbx
 	mov rsp, rbp

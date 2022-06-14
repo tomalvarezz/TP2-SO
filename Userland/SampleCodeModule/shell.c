@@ -25,8 +25,48 @@ static void pipe_routine(int pipe_pos, int argc, char** argv);
 static int execute_pipe(int pipe_pos, int argc, char** argv);
 static int pipe_command(int argc, char** argv, int fdin, int fdout, int foreground);
 
+
+#define NAME 0
+
+static void processB(int argc, char**argv){
+    char toPrint[20];
+    char* memoryB = sys_shm_open(NAME);
+    
+    int length=strLen(memoryB);
+
+    for (int i = 0; i < length; i++){
+        toPrint[i]=memoryB[i];
+    }
+
+    printf("ProcesoB: %s\n", toPrint);
+}
+
+static void processA(int argc, char**argv){
+
+    char texto[20] = "hola mundo";
+    char* memoryA = sys_shm_open(NAME);
+
+    int length=strLen(texto);
+
+    for (int i = 0; i < length; i++){
+        memoryA[i]=texto[i];
+    }
+
+    printf("Listo A\n");
+}
+
 /*Funcion que se encarga de leer lo que ingrese el usuario constantemente hasta que escriba exit*/
 void shell(int argc, char** argv) {
+    printf("Testeo de shared memory antes de shell para no implementar comando\n");
+
+    char**argsA={"ProcesoA"};
+    sys_new_process(&processA, 1, argsA, FOREGROUND,0);
+
+    char**argsB={"ProcesoB"};
+    sys_new_process(&processB, 1, argsB, FOREGROUND,0);
+
+
+
     printf("Ingrese nombre de usuario: ");
     userLen = sys_read(STDIN, user, SIZE_BUF);
     user[--userLen] = 0;
